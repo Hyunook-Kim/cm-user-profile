@@ -1,26 +1,167 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ========================================
+   Font Face - S-Core Dream
+   ======================================== */
+
+@font-face {
+  font-family: "S-Core Dream";
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/subset-S-CoreDream-3Light.woff2") format("woff2");
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@font-face {
+  font-family: "S-Core Dream";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/subset-S-CoreDream-4Regular.woff2") format("woff2");
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@font-face {
+  font-family: "S-Core Dream";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/subset-S-CoreDream-5Medium.woff2") format("woff2");
 }
+
+/* ========================================
+   Design System - Tailwind v4 Theme
+   ======================================== */
+
+@theme {
+  /* ----------------------------------------
+     Brand Colors
+     ---------------------------------------- */
+  --color-pink: #FF3A92;
+  --color-navy: #2E364C;
+  --color-white: #FFFFFF;
+  --color-black: #1F1F1F;
+
+  /* ----------------------------------------
+     Gray Scale
+     ---------------------------------------- */
+  --color-gray-100: #F4F4F4;
+  --color-gray-200: #E4E4E4;
+  --color-gray-300: #B8B8B8;
+  --color-gray-500: #757575;
+  --color-gray-800: #2B2B2B;
+
+  /* ----------------------------------------
+     Font Family
+     ---------------------------------------- */
+  --font-sans: "S-Core Dream", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* ----------------------------------------
+     Typography Values (typo- prefix)
+     - 재사용 가능한 변수로 관리
+     - Tailwind 자동생성 방지를 위해 typo- 접두사 사용
+     ---------------------------------------- */
+
+  /* Header */
+  --typo-header-xl-size: 20px;
+  --typo-header-xl-height: 28px;
+  --typo-header-xl-weight: 500;
+
+  --typo-header-lg-size: 18px;
+  --typo-header-lg-height: 24px;
+  --typo-header-lg-weight: 500;
+
+  --typo-header-md-size: 16px;
+  --typo-header-md-height: 20px;
+  --typo-header-md-weight: 500;
+
+  /* Body */
+  --typo-body-lg-size: 16px;
+  --typo-body-lg-height: 24px;
+  --typo-body-lg-weight: 500;
+
+  --typo-body-md-size: 14px;
+  --typo-body-md-height: 24px;
+  --typo-body-md-weight: 400;
+
+  /* Caption */
+  --typo-caption-lg-size: 14px;
+  --typo-caption-lg-height: 20px;
+  --typo-caption-lg-weight: 400;
+
+  --typo-caption-md-size: 12px;
+  --typo-caption-md-height: 16px;
+  --typo-caption-md-weight: 500;
+
+  --typo-caption-sm-size: 10px;
+  --typo-caption-sm-height: 12px;
+  --typo-caption-sm-weight: 300;
+}
+
+/* ========================================
+   Base Styles
+   ======================================== */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  color: var(--color-black);
+  background-color: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================
+   Typography Utility Classes
+   - @theme 변수를 참조하여 일관성 유지
+   ======================================== */
+
+/* Header */
+.text-header-xl {
+  font-size: var(--typo-header-xl-size);
+  line-height: var(--typo-header-xl-height);
+  font-weight: var(--typo-header-xl-weight);
+}
+
+.text-header-lg {
+  font-size: var(--typo-header-lg-size);
+  line-height: var(--typo-header-lg-height);
+  font-weight: var(--typo-header-lg-weight);
+}
+
+.text-header-md {
+  font-size: var(--typo-header-md-size);
+  line-height: var(--typo-header-md-height);
+  font-weight: var(--typo-header-md-weight);
+}
+
+/* Body */
+.text-body-lg {
+  font-size: var(--typo-body-lg-size);
+  line-height: var(--typo-body-lg-height);
+  font-weight: var(--typo-body-lg-weight);
+}
+
+.text-body-md {
+  font-size: var(--typo-body-md-size);
+  line-height: var(--typo-body-md-height);
+  font-weight: var(--typo-body-md-weight);
+}
+
+/* Caption */
+.text-caption-lg {
+  font-size: var(--typo-caption-lg-size);
+  line-height: var(--typo-caption-lg-height);
+  font-weight: var(--typo-caption-lg-weight);
+}
+
+.text-caption-md {
+  font-size: var(--typo-caption-md-size);
+  line-height: var(--typo-caption-md-height);
+  font-weight: var(--typo-caption-md-weight);
+}
+
+.text-caption-sm {
+  font-size: var(--typo-caption-sm-size);
+  line-height: var(--typo-caption-sm-height);
+  font-weight: var(--typo-caption-sm-weight);
 }
