@@ -10,6 +10,7 @@ interface RadioGroupProps {
   value?: string;
   onChange?: (value: string) => void;
   layout?: "horizontal" | "vertical" | "grid";
+  columns?: 2 | 3;
   name: string;
 }
 
@@ -18,12 +19,13 @@ export default function RadioGroup({
   value,
   onChange,
   layout = "horizontal",
+  columns = 2,
   name,
 }: RadioGroupProps) {
   const layoutStyles = {
-    horizontal: "flex flex-row flex-wrap gap-[18px]",
+    horizontal: "flex flex-row flex-wrap gap-y-[4px] gap-x-[18px]",
     vertical: "flex flex-col gap-[18px]",
-    grid: "grid grid-cols-2 gap-[18px]",
+    grid: "flex flex-row flex-wrap gap-y-[4px] gap-x-[18px]",
   };
 
   return (
@@ -54,7 +56,7 @@ export default function RadioGroup({
               width={20}
               height={20}
             />
-            <span className="text-[14px] font-extralight leading-[20px] text-[#2B2B2B]">
+            <span className="text-[14px] font-light leading-[24px] text-gray-800">
               {option.label}
             </span>
           </label>

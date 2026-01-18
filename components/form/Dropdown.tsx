@@ -23,7 +23,7 @@ export default function Dropdown({
       <select
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
-        className="h-10 w-full appearance-none rounded border border-gray-200 bg-white py-2 pl-3 pr-10 text-[14px] font-extralight leading-[20px] text-[#2B2B2B] focus:border-pink focus:outline-none"
+        className="h-10 w-full appearance-none rounded border border-gray-200 bg-white py-2 pl-3 pr-10 text-[14px] font-light leading-[20px] text-gray-800 focus:border-pink focus:outline-none"
       >
         <option value="" disabled>
           {placeholder}

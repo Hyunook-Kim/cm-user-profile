@@ -129,55 +129,56 @@ body {
 
 /* ========================================
    Typography Utility Classes
+   - @utility 지시자로 Tailwind IntelliSense 지원
    - @theme 변수를 참조하여 일관성 유지
    ======================================== */
 
 /* Header */
-.text-header-xl {
+@utility text-header-xl {
   font-size: var(--typo-header-xl-size);
   line-height: var(--typo-header-xl-height);
   font-weight: var(--typo-header-xl-weight);
 }
 
-.text-header-lg {
+@utility text-header-lg {
   font-size: var(--typo-header-lg-size);
   line-height: var(--typo-header-lg-height);
   font-weight: var(--typo-header-lg-weight);
 }
 
-.text-header-md {
+@utility text-header-md {
   font-size: var(--typo-header-md-size);
   line-height: var(--typo-header-md-height);
   font-weight: var(--typo-header-md-weight);
 }
 
 /* Body */
-.text-body-lg {
+@utility text-body-lg {
   font-size: var(--typo-body-lg-size);
   line-height: var(--typo-body-lg-height);
   font-weight: var(--typo-body-lg-weight);
 }
 
-.text-body-md {
+@utility text-body-md {
   font-size: var(--typo-body-md-size);
   line-height: var(--typo-body-md-height);
   font-weight: var(--typo-body-md-weight);
 }
 
 /* Caption */
-.text-caption-lg {
+@utility text-caption-lg {
   font-size: var(--typo-caption-lg-size);
   line-height: var(--typo-caption-lg-height);
   font-weight: var(--typo-caption-lg-weight);
 }
 
-.text-caption-md {
+@utility text-caption-md {
   font-size: var(--typo-caption-md-size);
   line-height: var(--typo-caption-md-height);
   font-weight: var(--typo-caption-md-weight);
 }
 
-.text-caption-sm {
+@utility text-caption-sm {
   font-size: var(--typo-caption-sm-size);
   line-height: var(--typo-caption-sm-height);
   font-weight: var(--typo-caption-sm-weight);
