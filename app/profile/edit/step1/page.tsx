@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller, FormProvider, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormNavigation } from "@/hooks/useFormNavigation";
+import { saveStepData, getStepData } from "@/lib/api/profile";
 import Header from "@/components/layout/Header";
 import ProgressBar from "@/components/layout/ProgressBar";
 import Title from "@/components/layout/Title";
@@ -33,14 +34,19 @@ import {
 } from "@/constants/step1Options";
 import { step1Schema, step1DefaultValues, Step1FormData } from "@/models/step1Form";
 
-// 임시 서버 저장 함수 (Supabase 연동 전)
+// Supabase 저장 함수
 const saveToServer = async (data: Step1FormData) => {
-  console.log("Saving to server:", data);
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  console.log("[Step1] 저장 시작:", data);
+  const result = await saveStepData(1, data);
+  console.log("[Step1] 저장 결과:", result);
+  if (!result.success) {
+    throw new Error(result.error);
+  }
 };
 
 export default function Step1Page() {
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const methods = useForm<Step1FormData>({
     resolver: zodResolver(step1Schema),
@@ -75,6 +81,23 @@ export default function Step1Page() {
     control,
     name: "schools",
   });
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    const loadData = async () => {
+      console.log("[Step1] 데이터 로드 시작");
+      const savedData = await getStepData<Step1FormData>(1);
+      console.log("[Step1] 로드된 데이터:", savedData);
+      if (savedData) {
+        reset(savedData);
+        console.log("[Step1] reset 완료");
+      } else {
+        console.log("[Step1] 저장된 데이터 없음");
+      }
+      setIsLoading(false);
+    };
+    loadData();
+  }, [reset]);
 
   // 저장 (페이지 유지)
   const handleSave = async (data: Step1FormData) => {

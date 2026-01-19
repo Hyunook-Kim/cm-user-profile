@@ -1,36 +1,197 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CM User Profile
 
-## Getting Started
+사용자 프로필 등록을 위한 멀티스텝 폼 애플리케이션
 
-First, run the development server:
+## 기술 스택
+
+### 핵심 기술
+
+- **Next.js 16.1.1** (App Router) - 서버 컴포넌트 및 파일 기반 라우팅
+- **React 19.2.3** - UI 라이브러리
+- **TypeScript** - 타입 안정성
+- **Tailwind CSS v4** - 유틸리티 기반 스타일링
+- **Supabase** - 백엔드 및 데이터베이스
+
+### 폼 관리: react-hook-form + zod
+
+**선택 근거:**
+
+- **비제어 컴포넌트 기반**: 리렌더링 최소화로 7단계 멀티스텝 폼에서 성능 최적화
+- **zod 통합**: 스키마 기반 유효성 검사로 타입 추론과 런타임 검증 동시 해결
+- **작은 번들 사이즈**: react-hook-form은 ~9KB로 Formik 대비 경량
+
+### 주요 라이브러리
+
+- `react-hook-form` v7.71.1 - 폼 상태 관리
+- `zod` v4.3.5 - 스키마 유효성 검사
+- `@hookform/resolvers` v5.2.2 - zod 연동
+
+## 실행 방법
 
 ```bash
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 프로젝트 구조
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+├── app/                 # Next.js App Router 페이지
+├── components/          # 재사용 컴포넌트
+├── constants/           # 상수 및 옵션 데이터
+├── hooks/               # 커스텀 훅
+├── models/              # 타입 및 스키마 정의
+└── docs/                # 프로젝트 문서
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 구현물의 디자인 확인 시 고려사항(뷰포트 설정)
 
-## Learn More
+### 피그마 디자인 기준
 
-To learn more about Next.js, take a look at the following resources:
+- **기준 해상도**: 375 x 812 (모바일)
+  (구현물에서는 정적으로 375x812를 고정하지 않고, 반응형 요소를 고려하여 동적으로 작업했습니다.)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 브라우저에서 확인하는 방법
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+브라우저 개발자 도구의 Device Toolbar에서 375 x 812 뷰포트로 설정하여 확인해주세요.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 디자인 개선 제안
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> 개발 과정에서 발견한 피그마 디자인 스펙의 누락/개선 필요 항목입니다.
+> 실제 구현 시 UX 완성도를 높이기 위해 디자이너와 협의가 필요한 사항들을 정리했습니다.
+
+### 공통 (Common)
+
+| 항목                                                                 | 현재 상태             | 개선 제안                                    |
+| -------------------------------------------------------------------- | --------------------- | -------------------------------------------- |
+| 필수항목 미작성 피드백                                               | UI/UX 피드백 누락     | 에러 상태 스타일 및 메시지 명세 필요         |
+| 드랍다운 펼침 UI                                                     | 펼침 상태 디자인 누락 | 신장 등 드랍다운 클릭 시 옵션 리스트 UI 필요 |
+| Footer 텍스트 스타일(viewport 컨텐츠의 하단에 있는 사업자 정보 섹션) | 디자인시스템 미정의   | 12px/regular 스타일 토큰 추가 권장           |
+
+### 기본정보 (1/7 페이지)
+
+| 항목                       | 현재 상태         | 개선 제안                                  |
+| -------------------------- | ----------------- | ------------------------------------------ |
+| 뒤로가기 버튼              | 동작/UI 명세 누락 | 이탈 확인 모달 등 플로우 정의 필요         |
+| 현재 거주지역              | 상세 스펙 누락    | 시/도, 구/군 선택 UI 명세 필요             |
+| 검색 버튼 (교회/학교/직업) | 클릭 후 UI 누락   | 검색 모달 또는 자동완성 UI 필요            |
+| 입력 필드 max length       | 정보 누락         | 각 필드별 최대 글자 수 명시 필요           |
+| 나의스타일 5개 선택 제한   | UX 의도 미명시    | 선택 완료 시 나머지 disable 처리 명세 필요 |
+
+### 반응형 대응
+
+| 항목           | 현재 상태                | 개선 제안                                   |
+| -------------- | ------------------------ | ------------------------------------------- |
+| 기기별 spacing | 커뮤니케이션 방법 미정의 | 브레이크포인트별 padding/margin 가이드 필요 |
+
+### 팝업/모달
+
+| 항목             | 현재 상태 | 개선 제안                              |
+| ---------------- | --------- | -------------------------------------- |
+| 팝업 위치        | 명세 누락 | 화면 위치 정의 필요                    |
+| 저장 완료 피드백 | UI 누락   | 성공/실패 토스트 또는 모달 디자인 필요 |
+
+### 디자인 시스템 일관성
+
+| 항목                   | 현재 상태                                  | 개선 제안                                                                               |
+| ---------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Notice 텍스트 (빨간색) | CSS 복사 시 font-weight 200, 명세와 불일치 | 디자인시스템 토큰과 동기화 필요                                                         |
+| 색상 변형 아이콘       | 별도 파일로 분산                           | 동일 아이콘의 색상 변형은 같은 섹션에 정리 권장 (예: question-line, question-line-pink) |
+
+---
+
+## LLM 활용 및 한계 극복
+
+### 사용 모델
+
+| 항목      | 내용                                             |
+| --------- | ------------------------------------------------ |
+| 모델      | **Claude Opus 4.5** (`claude-opus-4-5-20251101`) |
+| 도구      | **Claude Code CLI** (Anthropic 공식 CLI)         |
+| 활용 방식 | 에이전트 기반 코드 생성 및 분석                  |
+
+### 할루시네이션(Hallucination) 대응
+
+#### 1. 문서 기반 개발 (Documentation-Driven Development)
+
+프로젝트 루트의 `CLAUDE.md` 파일 뿐만 아니라 각 비즈니스 로직에 해당하는 md파일을 만들어서
+AI가 반드시 따라야 할 규칙을 정의했습니다.
+
+```markdown
+# md파일 내용의 예시
+
+- 피그마 스펙 100% 준수 원칙
+- 임의 추정 절대 금지 (픽셀값, 색상 등 확실한 데이터 없는 추정 금지)
+- 스펙 문서 혹은 정확한 데이터를 확신할 수 없으면 사용자에게 요청하도록 지시
+```
+
+**효과**: AI가 불확실한 정보를 추측하는 대신, 명시된 스펙만 사용하거나 사용자에게 확인을 요청하도록 유도
+
+#### 2. 구조화된 스펙 문서 시스템
+
+```
+docs/figma_specs/
+├── TEMPLATE.md              # 스펙 문서 템플릿
+├── common/                  # 공통 컴포넌트 스펙
+│   ├── FIGMA_CSS_COPY_GUIDE.md
+│   └── STEP1_COMPONENTS.md
+├── 1_기본정보/              # 1/7 페이지 전용
+└── ...
+```
+
+| 문제 상황             | 기존 방식 (할루시네이션 위험)     | 개선된 방식                   |
+| --------------------- | --------------------------------- | ----------------------------- |
+| 색상 코드 추정        | "파란색이니까 #0066FF 정도겠네요" | `#FF5A7E` 등 명시된 값만 사용 |
+| 컴포넌트 스펙 누락 시 | 임의로 비슷하게 구현              | 사용자에게 스펙 추출 요청     |
+
+#### 3. 작업 추적 시스템 (Context 유실 방지)
+
+LLM은 긴 대화에서 이전 맥락을 잃어버리는 경향이 있습니다. 이를 방지하기 위해 명시적 상태 관리 시스템을 도입했습니다.
+
+| 문서                                    | 역할                         |
+| --------------------------------------- | ---------------------------- |
+| `docs/work_plan/IMPLEMENTATION_PLAN.md` | 전체 구현 계획 및 Phase 정의 |
+| `docs/current_work/CURRENT_PHASE.md`    | 현재 진행 중인 작업 상태     |
+
+**상태 추적 체계**:
+
+```
+⬜ 미시작 → 🔄 진행중 → ✅ 완료
+```
+
+**효과**: AI가 현재 어떤 작업을 하고 있는지, 다음에 무엇을 해야 하는지 명확하게 인지
+
+#### 4. 전문 에이전트 분리 (Sub-Agent 병렬 작업)
+
+단일 AI에게 모든 작업을 맡기면 컨텍스트가 복잡해지고 오류 가능성이 증가합니다. 이를 해결하기 위해 전문화된 서브에이전트를 분리했습니다.
+
+| 에이전트 ID           | 전문 분야          | 제공되는 컨텍스트             |
+| --------------------- | ------------------ | ----------------------------- |
+| `supabase-backend`    | 백엔드/DB 설계     | Supabase 스키마, API 문서     |
+| `design-analyst`      | 피그마 디자인 분석 | 피그마 파일, 디자인 시스템    |
+| `figma-spec-analyzer` | 스펙 검증          | 구현 코드 vs 피그마 스펙 비교 |
+
+**효과**:
+
+- 각 에이전트에게 관련 컨텍스트만 제공하여 정확도 향상
+- 병렬 실행으로 작업 효율성 증대
+- 단일 에이전트의 컨텍스트 오버로드 방지
+
+### 적용 결과
+
+| 지표                 | 개선 효과                         |
+| -------------------- | --------------------------------- |
+| 피그마-구현 불일치   | 스펙 문서 기반 검증으로 최소화    |
+| AI의 임의 추정       | CLAUDE.md 규칙으로 원천 차단      |
+| 컨텍스트 유실        | 작업 추적 문서로 명시적 상태 관리 |
+| 복잡한 작업의 정확도 | 전문 에이전트 분리로 향상         |
+
+### 핵심 인사이트
+
+> **LLM은 도구이지 개발자가 아닙니다.**
+> AI가 "알아서 잘 해줄 것"이라고 기대하기보다, **명확한 규칙과 구조화된 문서**를 통해 AI의 행동 범위를 제한하고 검증 가능하게 만드는 것이 핵심입니다.

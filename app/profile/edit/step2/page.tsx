@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormNavigation } from "@/hooks/useFormNavigation";
+import { saveStepData, getStepData } from "@/lib/api/profile";
 import Header from "@/components/layout/Header";
 import ProgressBar from "@/components/layout/ProgressBar";
 import Title from "@/components/layout/Title";
@@ -14,10 +15,14 @@ import Card from "@/components/form/Card";
 import TextArea from "@/components/form/TextArea";
 import { step2Schema, step2DefaultValues, Step2FormData } from "@/models/step2Form";
 
-// 임시 서버 저장 함수 (Supabase 연동 전)
+// Supabase 저장 함수
 const saveToServer = async (data: Step2FormData) => {
-  console.log("Saving to server:", data);
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  console.log("[Step2] 저장 시작:", data);
+  const result = await saveStepData(2, data);
+  console.log("[Step2] 저장 결과:", result);
+  if (!result.success) {
+    throw new Error(result.error);
+  }
 };
 
 // 카드 설정 (라벨, 필드명, TextArea 높이)
@@ -34,6 +39,7 @@ const cardConfigs = [
 
 export default function Step2Page() {
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const methods = useForm<Step2FormData>({
     resolver: zodResolver(step2Schema),
@@ -62,6 +68,23 @@ export default function Step2Page() {
     prevUrl: "/profile/edit/step1",
     nextUrl: "/profile/edit/step3",
   });
+
+  // 초기 데이터 로드
+  useEffect(() => {
+    const loadData = async () => {
+      console.log("[Step2] 데이터 로드 시작");
+      const savedData = await getStepData<Step2FormData>(2);
+      console.log("[Step2] 로드된 데이터:", savedData);
+      if (savedData) {
+        reset(savedData);
+        console.log("[Step2] reset 완료");
+      } else {
+        console.log("[Step2] 저장된 데이터 없음");
+      }
+      setIsLoading(false);
+    };
+    loadData();
+  }, [reset]);
 
   // 저장 (페이지 유지)
   const handleSave = async (data: Step2FormData) => {
