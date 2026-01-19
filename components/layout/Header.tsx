@@ -23,7 +23,7 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-10 flex h-[54px] items-center bg-white px-1 py-2">
+    <header className="sticky top-[52px] z-10 flex h-[54px] items-center bg-white px-1 py-2">
       <button
         type="button"
         onClick={handleBack}
