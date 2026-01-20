@@ -16,7 +16,7 @@ export default function Button({
   className = "",
 }: ButtonProps) {
   const baseStyles =
-    "h-10 min-w-[120px] px-4 py-3 rounded-lg text-[16px] font-medium leading-[20px] transition-colors";
+    "h-10 px-4 py-3 rounded-lg text-[16px] font-medium leading-[20px] transition-colors";
 
   const variantStyles = {
     primary: "bg-pink text-white",

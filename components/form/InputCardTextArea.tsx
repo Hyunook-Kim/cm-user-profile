@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-interface TextAreaProps {
+interface InputCardTextAreaProps {
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
@@ -9,14 +9,14 @@ interface TextAreaProps {
   showClearIcon?: boolean;
 }
 
-export default function TextArea({
+export default function InputCardTextArea({
   value,
   onChange,
   placeholder = "답변을 작성해주세요.",
   disabled = false,
   height = 150,
   showClearIcon = true,
-}: TextAreaProps) {
+}: InputCardTextAreaProps) {
   const handleClear = () => {
     onChange?.("");
   };
@@ -31,8 +31,11 @@ export default function TextArea({
         style={{
           height: `${height}px`,
           minHeight: `${Math.min(height, 150)}px`,
+          // 스크롤바 숨김 (Firefox, IE, Chrome/Safari)
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}
-        className="text-body-md min-w-[100px] flex-1 resize-none rounded border border-gray-200 bg-white p-3  text-gray-800 placeholder:text-gray-800 focus:border-pink focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+        className="text-body-md min-w-[100px] flex-1 resize-none rounded border border-gray-200 bg-white p-3 text-gray-800 placeholder:text-gray-300 focus:border-pink focus:outline-none disabled:bg-gray-50 disabled:text-gray-400 [&::-webkit-scrollbar]:hidden"
       />
       {showClearIcon && (
         <button

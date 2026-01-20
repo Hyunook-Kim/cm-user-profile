@@ -12,7 +12,7 @@ import ContentFooter from "@/components/layout/ContentFooter";
 import FooterNav from "@/components/layout/FooterNav";
 import ExitConfirmModal from "@/components/common/ExitConfirmModal";
 import Card from "@/components/form/Card";
-import TextArea from "@/components/form/TextArea";
+import InputCardTextArea from "@/components/form/InputCardTextArea";
 import { step2Schema, step2DefaultValues, Step2FormData } from "@/models/step2Form";
 
 // Supabase 저장 함수
@@ -66,7 +66,8 @@ export default function Step2Page() {
   } = useFormNavigation({
     isDirty,
     prevUrl: "/profile/edit/step1",
-    nextUrl: "/profile/edit/step3",
+    // TODO: step3(사진업로드) 개발 후 "/profile/edit/step3"으로 변경
+    nextUrl: "/profile/edit/step4",
   });
 
   // 초기 데이터 로드
@@ -151,7 +152,7 @@ export default function Step2Page() {
                   name={config.field}
                   control={control}
                   render={({ field }) => (
-                    <TextArea
+                    <InputCardTextArea
                       value={field.value}
                       onChange={field.onChange}
                       height={config.height}
@@ -172,6 +173,7 @@ export default function Step2Page() {
         onSave={() => handleSubmit(handleSave, onValidationError)()}
         onNext={handleNextWithCheck}
         isSaving={isSaving}
+        variant="middle"
       />
 
       <ExitConfirmModal
