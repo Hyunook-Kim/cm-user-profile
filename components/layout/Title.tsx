@@ -3,6 +3,7 @@ interface TitleProps {
   step: number;
   totalSteps?: number;
   subtitle?: string;
+  helpIcon?: React.ReactNode;
 }
 
 export default function Title({
@@ -10,6 +11,7 @@ export default function Title({
   step,
   totalSteps = 7,
   subtitle,
+  helpIcon,
 }: TitleProps) {
   return (
     <div className="flex h-6 items-center justify-between self-stretch">
@@ -17,6 +19,7 @@ export default function Title({
         <h2 className="text-[18px] font-medium leading-[24px] text-black">
           {title}
         </h2>
+        {helpIcon}
         {subtitle && (
           <span className="text-[14px] font-medium leading-[20px] text-pink">
             {subtitle}

@@ -16,6 +16,8 @@ import Title from "@/components/layout/Title";
 import ContentFooter from "@/components/layout/ContentFooter";
 import FooterNav from "@/components/layout/FooterNav";
 import ExitConfirmModal from "@/components/common/ExitConfirmModal";
+import HelpIcon from "@/components/common/HelpIcon";
+import HelpModal from "@/components/common/HelpModal";
 import Card from "@/components/form/Card";
 import InputCardTextArea from "@/components/form/InputCardTextArea";
 import {
@@ -97,6 +99,7 @@ const cardConfigs = [
 
 export default function Step4Page() {
   const [isSaving, setIsSaving] = useState(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   const methods = useForm<Step4FormData>({
     resolver: zodResolver(step4Schema),
@@ -218,7 +221,9 @@ export default function Step4Page() {
           <Title
             title="매력어필"
             step={4}
-            subtitle="*모든 항목이 필수입니다."
+            helpIcon={
+              <HelpIcon color="pink" onClick={() => setIsHelpModalOpen(true)} />
+            }
           />
 
           <form
@@ -307,6 +312,12 @@ export default function Step4Page() {
         onSave={handleSaveAndExit}
         onDiscard={handleDiscardAndExit}
         isSaving={isSaving}
+      />
+
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+        title="매력어필 안내"
       />
     </>
   );

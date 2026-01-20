@@ -33,17 +33,20 @@ const saveToServer = async (data: Step7FormData) => {
 // 메인화면 추천 옵션
 const mainRecommendationOptions = [
   { value: "want", label: "원한다" },
-  { value: "notWant", label: "원치 않는다" },
+  { value: "notWant", label: "원하지 않는다" },
 ];
 
 // 같은 교회 소개 옵션
 const sameChurchOptions = [
   { value: "want", label: "원한다" },
-  { value: "notWant", label: "원치 않는다" },
+  { value: "notWant", label: "원하지 않는다" },
 ];
 
 // 메인화면 추천 설명 텍스트
-const mainRecommendationDescriptions: Record<string, { text: string; color: string }> = {
+const mainRecommendationDescriptions: Record<
+  string,
+  { text: string; color: string }
+> = {
   want: {
     text: "심사 후 선정 되신 분들에 한하여 공개되며, 이름·연락처·교회명·직장명은 비공개 처리됩니다.",
     color: "text-gray-300",
@@ -135,7 +138,7 @@ export default function Step7Page() {
       setValue("loveLanguageRanking", newRanking, { shouldDirty: true });
       setDraggedIndex(null);
     },
-    [draggedIndex, loveLanguageRanking, setValue]
+    [draggedIndex, loveLanguageRanking, setValue],
   );
 
   // 저장 (페이지 유지)
@@ -196,7 +199,7 @@ export default function Step7Page() {
       <ProgressBar step={7} totalSteps={7} />
       <main className="flex flex-col items-start gap-[18px] overflow-y-auto bg-gray-100 p-4 pb-[96px]">
         <FormProvider {...methods}>
-          <Title title="추가정보" step={7} subtitle="*모든 항목이 필수입니다." />
+          <Title title="추가정보" step={7} />
 
           <form
             onSubmit={(e) => e.preventDefault()}
@@ -207,7 +210,9 @@ export default function Step7Page() {
               {/* Section Title */}
               <div className="flex items-center gap-3">
                 <span className="text-body-lg text-black">사랑의 언어</span>
-                <span className="text-caption-lg text-pink">*드래그하여 순위 변경</span>
+                <span className="text-caption-lg text-pink">
+                  *드래그하여 순위 변경
+                </span>
               </div>
 
               {/* Draggable List */}
@@ -242,7 +247,9 @@ export default function Step7Page() {
                       {/* Text Area */}
                       <div className="flex flex-col">
                         <div className="flex items-center gap-1">
-                          <span className="text-caption-lg text-pink">{index + 1}위</span>
+                          <span className="text-caption-lg text-pink">
+                            {index + 1}위
+                          </span>
                           <span className="text-caption-lg text-gray-800">
                             {option.label}
                           </span>
@@ -292,7 +299,10 @@ export default function Step7Page() {
                       <p
                         className={`mt-2 text-body-md ${mainRecommendationDescriptions[mainRecommendation].color}`}
                       >
-                        {mainRecommendationDescriptions[mainRecommendation].text}
+                        {
+                          mainRecommendationDescriptions[mainRecommendation]
+                            .text
+                        }
                       </p>
                     )}
                   </div>

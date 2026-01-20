@@ -5,13 +5,15 @@ import { useForm, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormNavigation } from "@/hooks/useFormNavigation";
 import { saveStepData, getStepData } from "@/lib/api/profile";
-import Image from "next/image";
 import Header from "@/components/layout/Header";
+import PriorityTag from "@/components/form/PriorityTag";
 import ProgressBar from "@/components/layout/ProgressBar";
 import Title from "@/components/layout/Title";
 import ContentFooter from "@/components/layout/ContentFooter";
 import FooterNav from "@/components/layout/FooterNav";
 import ExitConfirmModal from "@/components/common/ExitConfirmModal";
+import HelpIcon from "@/components/common/HelpIcon";
+import HelpModal from "@/components/common/HelpModal";
 import Card from "@/components/form/Card";
 import TagGroup from "@/components/form/TagGroup";
 import RadioGroup from "@/components/form/RadioGroup";
@@ -22,17 +24,18 @@ import {
   step5DefaultValues,
   Step5FormData,
   priorityOptions,
+  importantFactorOptions,
   locationOptions,
   ageOptions,
-  jobPositionOptions,
-  familyCultureOptions,
+  educationOptions,
+  christianFamilyOptions,
   bodyTypeOptions,
   styleOptions,
   heightOptions,
+  incomeOptions,
   drinkSmokeOptions,
-  healthStatusOptions,
+  christianWorkerOptions,
   remarriageOptions,
-  otherConditionOptions,
 } from "@/models/step5Form";
 
 // Supabase 저장 함수
@@ -53,6 +56,7 @@ export default function Step5Page() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   const methods = useForm<Step5FormData>({
     resolver: zodResolver(step5Schema),
@@ -128,7 +132,7 @@ export default function Step5Page() {
       setValue("priorityRanking", newRanking, { shouldDirty: true });
       setDraggedIndex(null);
     },
-    [draggedIndex, priorityRanking, setValue]
+    [draggedIndex, priorityRanking, setValue],
   );
 
   // priority id로 label 찾기
@@ -190,7 +194,13 @@ export default function Step5Page() {
       <ProgressBar step={5} totalSteps={7} />
       <main className="flex flex-col items-start gap-[18px] overflow-y-auto bg-gray-100 p-4 pb-[96px]">
         <FormProvider {...methods}>
-          <Title title="이상형정보" step={5} subtitle="*모든 항목이 필수입니다." />
+          <Title
+            title="이상형정보"
+            step={5}
+            helpIcon={
+              <HelpIcon color="pink" onClick={() => setIsHelpModalOpen(true)} />
+            }
+          />
 
           <form
             onSubmit={(e) => e.preventDefault()}
@@ -200,44 +210,65 @@ export default function Step5Page() {
             <section className="flex flex-col gap-3">
               <div className="flex items-center gap-1">
                 <span className="text-body-lg text-black">조건 우선순위</span>
-                <span className="text-caption-lg text-pink">*드래그하여 순서 변경</span>
+                <span className="text-caption-lg text-pink">
+                  *드래그하여 순위 변경
+                </span>
               </div>
 
               {/* Priority Tags Container */}
               <div className="flex flex-wrap gap-1">
                 {priorityRanking.map((id, index) => (
-                  <div
+                  <PriorityTag
                     key={id}
-                    draggable
+                    rank={index + 1}
+                    label={getPriorityLabel(id)}
+                    isDragging={draggedIndex === index}
                     onDragStart={() => handleDragStart(index)}
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop(index)}
-                    className={`flex cursor-grab items-center gap-1 rounded-lg border bg-white px-2 py-2 active:cursor-grabbing ${
-                      draggedIndex === index
-                        ? "border-pink opacity-50"
-                        : "border-gray-200"
-                    }`}
-                  >
-                    <Image
-                      src="/icons/basic/drag-line.svg"
-                      alt=""
-                      width={16}
-                      height={16}
-                    />
-                    <span className="text-caption-md text-navy">
-                      {index + 1}. {getPriorityLabel(id)}
-                    </span>
-                  </div>
+                  />
                 ))}
               </div>
             </section>
 
-            {/* Section 2: 희망 조건 */}
+            {/* Section 2: 이성을 볼 때 중요하게 생각하는 요소 */}
+            <Card
+              label="이성을 볼 때 중요하게 생각하는 요소를 선택해주세요."
+              subtitle="*필수"
+              secondaryText="중복체크 가능"
+            >
+              <Controller
+                name="importantFactors"
+                control={control}
+                render={({ field }) => (
+                  <Controller
+                    name="importantFactorsOther"
+                    control={control}
+                    render={({ field: otherField }) => (
+                      <TagGroup
+                        options={importantFactorOptions}
+                        value={field.value}
+                        onChange={field.onChange}
+                        hasOtherOption={true}
+                        otherValue={otherField.value || ""}
+                        onOtherChange={otherField.onChange}
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Card>
+
+            {/* Section 3: 희망 조건 */}
             <section className="flex flex-col gap-3">
               <span className="text-body-lg text-black">희망 조건</span>
 
-              {/* Card 0: 거주지역 */}
-              <Card label="원하는 거주지역 선택" subtitle="*중복선택 가능">
+              {/* Card 1: 거주지역 */}
+              <Card
+                label="이상형의 원하는 거주지역을 선택해주세요."
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="desiredLocations"
                   control={control}
@@ -251,70 +282,104 @@ export default function Step5Page() {
                 />
               </Card>
 
-              {/* Card 1: 나이대 */}
-              <Card label="평소 원하는 배우자의 나이대 선택" subtitle="*중복선택 가능">
+              {/* Card 2: 나이대 */}
+              <Card
+                label="평소 원하는 배우자 나이를 선택해주세요."
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="desiredAgeRange"
                   control={control}
                   render={({ field }) => (
-                    <TagGroup
-                      options={toTagOptions(ageOptions)}
-                      value={field.value}
-                      onChange={field.onChange}
+                    <Controller
+                      name="desiredAgeRangeOther"
+                      control={control}
+                      render={({ field: otherField }) => (
+                        <TagGroup
+                          options={toTagOptions(ageOptions)}
+                          value={field.value}
+                          onChange={field.onChange}
+                          hasOtherOption={true}
+                          otherValue={otherField.value || ""}
+                          onOtherChange={otherField.onChange}
+                        />
+                      )}
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 2: 부모님 동거 */}
-              <Card label="결혼 후 부모님과 동거 가능 여부" subtitle="*필수">
+              {/* Card 3: 4년 이상 연상 최대 나이 */}
+              <Card label="4년 이상 연상일 경우 다른 부분이 이상형 조건과 부합된다면 최대 몇 살 연상까지 소개 가능하신가요?">
                 <Controller
-                  name="parentLivingTogether"
+                  name="maxOlderAge"
                   control={control}
                   render={({ field }) => (
                     <TextInput
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="답변을 입력해주세요."
+                      placeholder="최대 몇살까지"
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 3: 직책기준 */}
-              <Card label="이상형의 직책기준 선택" subtitle="*중복선택 가능">
+              {/* Card 4: 학력 기준 */}
+              <Card
+                label="이상형의 원하는 학력기준을 선택해주세요."
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
-                  name="jobPositions"
+                  name="desiredEducation"
                   control={control}
                   render={({ field }) => (
-                    <TagGroup
-                      options={toTagOptions(jobPositionOptions)}
-                      value={field.value}
-                      onChange={field.onChange}
+                    <Controller
+                      name="desiredEducationOther"
+                      control={control}
+                      render={({ field: otherField }) => (
+                        <TagGroup
+                          options={toTagOptions(educationOptions)}
+                          value={field.value}
+                          onChange={field.onChange}
+                          hasOtherOption={true}
+                          otherValue={otherField.value || ""}
+                          onOtherChange={otherField.onChange}
+                        />
+                      )}
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 4: 가족/가정문화 */}
-              <Card label="이상형의 가족과 가정문화가 중요한가요?" subtitle="*필수">
+              {/* Card 5: 기독교 가정 */}
+              <Card
+                label="소개받은 이성의 가족이 기독교 가정이길 바라시나요?"
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
-                  name="familyCulture"
+                  name="christianFamily"
                   control={control}
                   render={({ field }) => (
                     <RadioGroup
-                      options={familyCultureOptions}
+                      options={christianFamilyOptions}
                       value={field.value}
                       onChange={field.onChange}
-                      name="familyCulture"
+                      name="christianFamily"
                       layout="vertical"
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 5: 체형 */}
-              <Card label="원하시는 이상형 체형을 선택해주세요" subtitle="*중복선택 가능">
+              {/* Card 6: 체형 */}
+              <Card
+                label="원하시는 이상형 체형을 선택해주세요."
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="bodyTypes"
                   control={control}
@@ -328,8 +393,12 @@ export default function Step5Page() {
                 />
               </Card>
 
-              {/* Card 6: 스타일 */}
-              <Card label="원하시는 이상형 스타일을 선택해주세요" subtitle="*중복선택 가능">
+              {/* Card 7: 스타일 */}
+              <Card
+                label="원하시는 이상형 스타일을 선택해주세요."
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="styles"
                   control={control}
@@ -343,8 +412,12 @@ export default function Step5Page() {
                 />
               </Card>
 
-              {/* Card 7: 신장 */}
-              <Card label="원하시는 이상형 신장을 선택해주세요" subtitle="*중복선택 가능">
+              {/* Card 8: 신장 */}
+              <Card
+                label="이상형의 키를 선택해주세요."
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="heights"
                   control={control}
@@ -358,24 +431,32 @@ export default function Step5Page() {
                 />
               </Card>
 
-              {/* Card 8: 연봉 조건 */}
-              <Card label="이상형의 가능 연봉을 선택해주세요" subtitle="*필수">
+              {/* Card 9: 외모 포기 못하는 부분 */}
+              <Card
+                label="이성의 외모를 볼 때 포기할 수 없는 부분이 있나요? (키, 체형, 탈모, 얼굴 느낌 등)"
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
-                  name="incomeCondition"
+                  name="appearanceImportant"
                   control={control}
                   render={({ field }) => (
                     <InputCardTextArea
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="답변을 작성해주세요."
+                      placeholder="키는 저보다 크면 좋겠어요!! 딱딱하고 무서운 인상보다는 부드러운 인상을 좋아해요."
                       height={80}
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 9: 원하는 직업 */}
-              <Card label="배우자가 원하는 직업이 있으신가요?" subtitle="*필수">
+              {/* Card 10: 희망 직업 */}
+              <Card
+                label="배우자의 희망 직업이 있으세요? (상관 없을시 '상관없음'으로 기재)"
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="desiredJob"
                   control={control}
@@ -383,29 +464,56 @@ export default function Step5Page() {
                     <TextInput
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="답변을 입력해주세요."
+                      placeholder="상관없음"
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 10: 배우자 연봉 */}
-              <Card label="배우자의 가능 연봉을 선택해주세요" subtitle="*필수">
+              {/* Card 11: 기피 직업 */}
+              <Card
+                label="배우자의 기피 직업이 있으세요? (상관 없을시 '상관없음'으로 기재)"
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
-                  name="spouseIncome"
+                  name="avoidedJob"
                   control={control}
                   render={({ field }) => (
                     <TextInput
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="답변을 입력해주세요."
+                      placeholder="상관없음"
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 11: 음주/흡연 */}
-              <Card label="배우자는 음주, 흡연 관련 여부를 선택해주세요" subtitle="*필수">
+              {/* Card 12: 희망 연봉 */}
+              <Card
+                label="배우자의 희망 연봉을 선택해주세요."
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
+                <Controller
+                  name="desiredIncome"
+                  control={control}
+                  render={({ field }) => (
+                    <TagGroup
+                      options={toTagOptions(incomeOptions)}
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+              </Card>
+
+              {/* Card 13: 음주/흡연 */}
+              <Card
+                label="배우자의 음주, 흡연 희망 여부를 선택해주세요."
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="drinkSmoke"
                   control={control}
@@ -421,82 +529,104 @@ export default function Step5Page() {
                 />
               </Card>
 
-              {/* Card 12: 건강상 사정 */}
-              <Card label="건강상 사정/비혼인, 반려자 여부를 확인해주세요" subtitle="*필수">
+              {/* Card 14: 크리스천 사역자 */}
+              <Card
+                label="크리스천 사역자(목사, 선교사, 전도사, CCM사역자, 기독문화사역자, 교회간사 등)와의 만남은 어떠신가요?"
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
-                  name="healthStatus"
+                  name="christianWorker"
                   control={control}
                   render={({ field }) => (
-                    <RadioGroup
-                      options={healthStatusOptions}
-                      value={field.value}
-                      onChange={field.onChange}
-                      name="healthStatus"
-                      layout="vertical"
+                    <Controller
+                      name="christianWorkerOther"
+                      control={control}
+                      render={({ field: otherField }) => (
+                        <RadioGroup
+                          options={christianWorkerOptions}
+                          value={field.value}
+                          onChange={(val) => {
+                            field.onChange(val);
+                            if (val !== "other") {
+                              otherField.onChange("");
+                            }
+                          }}
+                          name="christianWorker"
+                          layout="vertical"
+                        />
+                      )}
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 13: 재혼경험 */}
-              <Card label="재혼경험도 이상형에게 부담이 되시나요?" subtitle="*필수">
+              {/* Card 15: 재혼 */}
+              <Card
+                label="재혼회원도 이상형에 부합한다면 괜찮나요?"
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="remarriage"
                   control={control}
                   render={({ field }) => (
-                    <RadioGroup
-                      options={remarriageOptions}
-                      value={field.value}
-                      onChange={field.onChange}
-                      name="remarriage"
-                      layout="vertical"
+                    <Controller
+                      name="remarriageOther"
+                      control={control}
+                      render={({ field: otherField }) => (
+                        <RadioGroup
+                          options={remarriageOptions}
+                          value={field.value}
+                          onChange={(val) => {
+                            field.onChange(val);
+                            if (val !== "other") {
+                              otherField.onChange("");
+                            }
+                          }}
+                          name="remarriage"
+                          layout="vertical"
+                        />
+                      )}
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 14: 기타 조건 */}
-              <Card label="기타 조건을 선택해주세요" subtitle="*필수">
-                <Controller
-                  name="otherCondition"
-                  control={control}
-                  render={({ field }) => (
-                    <RadioGroup
-                      options={otherConditionOptions}
-                      value={field.value}
-                      onChange={field.onChange}
-                      name="otherCondition"
-                      layout="vertical"
-                    />
-                  )}
-                />
-              </Card>
-
-              {/* Card 15: 추가 조건 1 */}
-              <Card label="추가 조건을 입력해주세요" subtitle="*필수">
+              {/* Card 16: 추가 조건 1 */}
+              <Card
+                label="그 외 원하시는 배우자 정보를 자세하게 적어주세요. (신앙관, 성격, 가치관, 취미 등)"
+                subtitle="*필수"
+                secondaryText="중복체크 가능"
+              >
                 <Controller
                   name="additionalCondition1"
                   control={control}
                   render={({ field }) => (
-                    <TextInput
+                    <InputCardTextArea
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="답변을 입력해주세요."
+                      placeholder="답변을 작성해주세요."
+                      height={80}
                     />
                   )}
                 />
               </Card>
 
-              {/* Card 16: 추가 조건 2 */}
-              <Card label="마지막 조건을 입력해주세요" subtitle="*필수">
+              {/* Card 17: 추가 조건 2 */}
+              <Card
+                label="그 외 배우자 및 이상형을 찾는 과정에서 매니저에게 부탁하고 싶은 말씀이나 건의사항 있으시다면 자유롭게 적어주세요."
+                subtitle=""
+              >
                 <Controller
                   name="additionalCondition2"
                   control={control}
                   render={({ field }) => (
-                    <TextInput
+                    <InputCardTextArea
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="답변을 입력해주세요."
+                      placeholder="답변을 작성해주세요."
+                      height={80}
                     />
                   )}
                 />
@@ -523,6 +653,12 @@ export default function Step5Page() {
         onSave={handleSaveAndExit}
         onDiscard={handleDiscardAndExit}
         isSaving={isSaving}
+      />
+
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+        title="이상형정보 안내"
       />
     </>
   );
