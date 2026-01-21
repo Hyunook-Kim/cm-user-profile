@@ -15,8 +15,7 @@ import Card from "@/components/form/Card";
 import Dropdown from "@/components/form/Dropdown";
 import RadioGroup from "@/components/form/RadioGroup";
 import TextInput from "@/components/form/TextInput";
-import SearchButton from "@/components/form/SearchButton";
-import AddButton from "@/components/form/AddButton";
+import SecondaryButton from "@/components/ui/SecondaryButton";
 import TagGroup from "@/components/form/TagGroup";
 import HelpIcon from "@/components/common/HelpIcon";
 import LocationSelector from "@/components/form/LocationSelector";
@@ -224,7 +223,7 @@ export default function Step1Page() {
                 />
               </div>
             </div>
-            <SearchButton label="교회 검색" />
+            <SecondaryButton label="교회 검색" icon="/icons/basic/search-line-white.svg" />
           </div>
         </Card>
 
@@ -279,9 +278,10 @@ export default function Step1Page() {
               </div>
             ))}
             <div className="flex gap-2">
-              <SearchButton label="학교 검색" />
-              <AddButton
+              <SecondaryButton label="학교 검색" icon="/icons/basic/search-line-white.svg" />
+              <SecondaryButton
                 label="추가"
+                icon="/icons/basic/add-line-white.svg"
                 onClick={() => appendSchool({ schoolName: "", major: "" })}
               />
             </div>
@@ -303,7 +303,7 @@ export default function Step1Page() {
                 )}
               />
             </div>
-            <SearchButton label="직업 검색" />
+            <SecondaryButton label="직업 검색" icon="/icons/basic/search-line-white.svg" />
           </div>
         </Card>
 

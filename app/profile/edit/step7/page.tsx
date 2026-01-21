@@ -19,6 +19,7 @@ import {
   Step7FormData,
   loveLanguageOptions,
 } from "@/models/step7Form";
+import SectionTitle from "@/components/ui/SectionTitle";
 
 // Supabase 저장 함수
 const saveToServer = async (data: Step7FormData) => {
@@ -208,12 +209,16 @@ export default function Step7Page() {
             {/* Section 1: 사랑의 언어 */}
             <section className="flex flex-col gap-3">
               {/* Section Title */}
-              <div className="flex items-center gap-3">
+              {/* <div className="flex items-center gap-3">
                 <span className="text-body-lg text-black">사랑의 언어</span>
                 <span className="text-caption-lg text-pink">
                   *드래그하여 순위 변경
                 </span>
-              </div>
+              </div> */}
+              <SectionTitle
+                title="사랑의 언어"
+                subtitle="드래그하여 순위 변경"
+              />
 
               {/* Draggable List */}
               <div className="flex flex-col gap-1">
@@ -267,7 +272,7 @@ export default function Step7Page() {
             {/* Section 2: 기타 */}
             <section className="flex flex-col gap-3">
               {/* Section Title */}
-              <span className="text-body-lg text-black">기타</span>
+              <SectionTitle title="기타" />
 
               {/* Card Group */}
               <div className="flex flex-col">

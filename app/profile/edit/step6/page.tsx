@@ -11,6 +11,8 @@ import Title from "@/components/layout/Title";
 import ContentFooter from "@/components/layout/ContentFooter";
 import FooterNav from "@/components/layout/FooterNav";
 import ExitConfirmModal from "@/components/common/ExitConfirmModal";
+import SectionTitle from "@/components/ui/SectionTitle";
+import SecondaryButton from "@/components/ui/SecondaryButton";
 import {
   step6Schema,
   step6DefaultValues,
@@ -75,29 +77,6 @@ function LifestyleTag({
     >
       {label}
     </button>
-  );
-}
-
-// 섹션 타이틀 컴포넌트
-interface SectionTitleProps {
-  title: string;
-  maxCount: number;
-  currentCount: number;
-}
-
-function SectionTitle({ title, maxCount, currentCount }: SectionTitleProps) {
-  return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <span className="text-body-lg text-black">{title}</span>
-        <span className="text-caption-lg text-pink">*최대 {maxCount}개</span>
-      </div>
-      <div className="flex items-center justify-center rounded bg-navy px-2 py-2">
-        <span className="text-caption-md text-white">
-          선택 {currentCount}개
-        </span>
-      </div>
-    </div>
   );
 }
 
@@ -308,11 +287,14 @@ export default function Step6Page() {
           >
             {/* Section 1: 취미 */}
             <section className="flex flex-col gap-3">
-              <SectionTitle
-                title="취미"
-                maxCount={5}
-                currentCount={hobbies.length}
-              />
+              <div className="flex h-[36px] items-center justify-between gap-3">
+                <SectionTitle title="취미" subtitle="최대 5개" />
+                <SecondaryButton
+                  label="선택 초기화"
+                  icon="/icons/basic/refresh-line-white.svg"
+                  onClick={() => setValue("hobbies", [], { shouldDirty: true })}
+                />
+              </div>
               <div className="flex flex-col">
                 {hobbyCateg.map((category, index) => (
                   <CategoryCard
@@ -332,11 +314,14 @@ export default function Step6Page() {
 
             {/* Section 2: 운동 */}
             <section className="flex flex-col gap-3">
-              <SectionTitle
-                title="운동"
-                maxCount={5}
-                currentCount={exercises.length}
-              />
+              <div className="flex h-[36px] items-center justify-between gap-3">
+                <SectionTitle title="운동" subtitle="최대 5개" />
+                <SecondaryButton
+                  label="선택 초기화"
+                  icon="/icons/basic/refresh-line-white.svg"
+                  onClick={() => setValue("exercises", [], { shouldDirty: true })}
+                />
+              </div>
               <div className="flex flex-col">
                 {exerciseCateg.map((category, index) => (
                   <CategoryCard
@@ -356,11 +341,14 @@ export default function Step6Page() {
 
             {/* Section 3: 관심사 */}
             <section className="flex flex-col gap-3">
-              <SectionTitle
-                title="관심사"
-                maxCount={5}
-                currentCount={interests.length}
-              />
+              <div className="flex h-[36px] items-center justify-between gap-3">
+                <SectionTitle title="관심사" subtitle="최대 5개" />
+                <SecondaryButton
+                  label="선택 초기화"
+                  icon="/icons/basic/refresh-line-white.svg"
+                  onClick={() => setValue("interests", [], { shouldDirty: true })}
+                />
+              </div>
               <div className="flex flex-col">
                 {interestCateg.map((category, index) => (
                   <CategoryCard
