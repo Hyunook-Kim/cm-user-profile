@@ -11,16 +11,6 @@ import { z } from "zod";
  * 데이터 출처: docs/figma_specs/5_이상형정보/direct-analysis/
  */
 
-// 조건 우선순위 옵션 (6개) - 피그마 direct-analysis 기준
-export const priorityOptions = [
-  { id: "faith", label: "신앙 및 가치관" },
-  { id: "personality", label: "성격 및 성품" },
-  { id: "age", label: "나이" },
-  { id: "bodyType", label: "체형" },
-  { id: "job", label: "직업" },
-  { id: "family", label: "부모님 및 집안 분위기" },
-];
-
 // Section 2: 이성을 볼 때 중요하게 생각하는 요소 옵션 (12개)
 export const importantFactorOptions = [
   { value: "economic", label: "경제능력" },
@@ -229,8 +219,8 @@ export type Step5FormData = z.infer<typeof step5Schema>;
  * 폼 기본값
  */
 export const step5DefaultValues: Step5FormData = {
-  // Section 1
-  priorityRanking: ["faith", "personality", "age", "bodyType", "job", "family"],
+  // Section 1: importantFactors와 연동됨 (선택된 항목들의 순서)
+  priorityRanking: [],
   // Section 2
   importantFactors: [],
   importantFactorsOther: "",

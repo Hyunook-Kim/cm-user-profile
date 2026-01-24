@@ -7,47 +7,34 @@ interface PriorityTagProps {
   label: string;
   /** 드래그 중 여부 */
   isDragging?: boolean;
-  /** 드래그 시작 핸들러 */
-  onDragStart?: () => void;
-  /** 드래그 오버 핸들러 */
-  onDragOver?: (e: React.DragEvent) => void;
-  /** 드롭 핸들러 */
-  onDrop?: () => void;
+  /** X 버튼 클릭 핸들러 (제거) */
+  onRemove?: () => void;
 }
 
 /**
- * 조건 우선순위 태그 컴포넌트
+ * 조건 우선순위 태그 컴포넌트 (순수 UI)
  *
  * 피그마 스펙 (imagebox-priority.md):
  * - Container: 89px width (auto), 32px height, padding 8px, gap 4px
  * - Background: #FFFFFF, Border: 1px solid #E4E4E4, Border-radius: 8px
  * - Leading icon: 16x16 number icon (pink)
  * - Text: 12px/16px, font-weight 500, color #2E364C (navy)
- * - Trailing icon: 14x14 drag icon (navy)
+ * - Trailing icon: 14x14 close icon
  */
 export default function PriorityTag({
   rank,
   label,
   isDragging = false,
-  onDragStart,
-  onDragOver,
-  onDrop,
+  onRemove,
 }: PriorityTagProps) {
   // 숫자 아이콘 경로 (1~7까지 지원)
   const numberIconPath = `/icons/number/number-${Math.min(rank, 7)}.svg`;
 
   return (
     <div
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      className={`box-border flex cursor-grab flex-row items-center gap-1 rounded-lg border bg-white px-2 py-2 active:cursor-grabbing ${
-        isDragging
-          ? "border-pink opacity-50"
-          : "border-gray-200"
+      className={`box-border flex h-8 cursor-grab flex-row items-center gap-1 rounded-lg border bg-white px-2 py-2 active:cursor-grabbing ${
+        isDragging ? "border-pink opacity-50" : "border-gray-200"
       }`}
-      style={{ height: "32px" }}
     >
       {/* Leading icon - Number */}
       <Image
@@ -63,14 +50,23 @@ export default function PriorityTag({
         {label}
       </span>
 
-      {/* Trailing icon - Close */}
-      <Image
-        src="/icons/basic/close-line.svg"
-        alt=""
-        width={14}
-        height={14}
-        className="flex-none"
-      />
+      {/* Trailing icon - Close (X button) */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove?.();
+        }}
+        className="flex-none p-0"
+        aria-label={`${label} 제거`}
+      >
+        <Image
+          src="/icons/basic/close-line.svg"
+          alt=""
+          width={14}
+          height={14}
+        />
+      </button>
     </div>
   );
 }

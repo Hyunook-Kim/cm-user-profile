@@ -3,10 +3,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { useFormNavigation } from "@/hooks/useFormNavigation";
 import { saveStepData, getStepData } from "@/lib/api/profile";
 import Header from "@/components/layout/Header";
-import PriorityTag from "@/components/form/PriorityTag";
+import SortablePriorityTag from "@/components/form/SortablePriorityTag";
 import ProgressBar from "@/components/layout/ProgressBar";
 import Title from "@/components/layout/Title";
 import ContentFooter from "@/components/layout/ContentFooter";
@@ -24,7 +37,6 @@ import {
   step5Schema,
   step5DefaultValues,
   Step5FormData,
-  priorityOptions,
   importantFactorOptions,
   locationOptions,
   ageOptions,
@@ -56,8 +68,16 @@ const toTagOptions = (arr: string[]) =>
 export default function Step5Page() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  // @dnd-kit 센서 설정 (PointerSensor: 마우스 + 터치 + 에뮬레이션 통합)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // 5px 이동 후 드래그 시작
+      },
+    }),
+  );
 
   const methods = useForm<Step5FormData>({
     resolver: zodResolver(step5Schema),
@@ -75,6 +95,7 @@ export default function Step5Page() {
   } = methods;
 
   const priorityRanking = watch("priorityRanking");
+  const importantFactors = watch("importantFactors");
 
   // 폼 네비게이션 (dirty check + 모달)
   const {
@@ -108,39 +129,70 @@ export default function Step5Page() {
     loadData();
   }, [reset]);
 
-  // 드래그 시작
-  const handleDragStart = useCallback((index: number) => {
-    setDraggedIndex(index);
-  }, []);
+  // @dnd-kit 드래그 종료 핸들러
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
 
-  // 드래그 오버
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-  }, []);
+      if (over && active.id !== over.id) {
+        const oldIndex = priorityRanking.indexOf(active.id as string);
+        const newIndex = priorityRanking.indexOf(over.id as string);
 
-  // 드롭
-  const handleDrop = useCallback(
-    (dropIndex: number) => {
-      if (draggedIndex === null || draggedIndex === dropIndex) {
-        setDraggedIndex(null);
-        return;
+        const newRanking = arrayMove(priorityRanking, oldIndex, newIndex);
+        setValue("priorityRanking", newRanking, { shouldDirty: true });
       }
-
-      const newRanking = [...priorityRanking];
-      const [removed] = newRanking.splice(draggedIndex, 1);
-      newRanking.splice(dropIndex, 0, removed);
-
-      setValue("priorityRanking", newRanking, { shouldDirty: true });
-      setDraggedIndex(null);
     },
-    [draggedIndex, priorityRanking, setValue],
+    [priorityRanking, setValue],
   );
 
-  // priority id로 label 찾기
-  const getPriorityLabel = (id: string) => {
-    const option = priorityOptions.find((opt) => opt.id === id);
-    return option ? option.label : id;
+  // priority value로 label 찾기 (importantFactorOptions에서)
+  const getPriorityLabel = (value: string) => {
+    const option = importantFactorOptions.find((opt) => opt.value === value);
+    return option ? option.label : value;
   };
+
+  // importantFactors 변경 시 priorityRanking 동기화
+  const handleImportantFactorsChange = useCallback(
+    (newValues: string[]) => {
+      // 새로 추가된 항목 찾기
+      const added = newValues.filter((v) => !importantFactors.includes(v));
+      // 제거된 항목 찾기
+      const removed = importantFactors.filter((v) => !newValues.includes(v));
+
+      // importantFactors 업데이트
+      setValue("importantFactors", newValues, { shouldDirty: true });
+
+      // priorityRanking 동기화
+      let newRanking = [...priorityRanking];
+
+      // 추가된 항목을 끝에 추가
+      added.forEach((item) => {
+        if (!newRanking.includes(item)) {
+          newRanking.push(item);
+        }
+      });
+
+      // 제거된 항목 삭제
+      newRanking = newRanking.filter((item) => !removed.includes(item));
+
+      setValue("priorityRanking", newRanking, { shouldDirty: true });
+    },
+    [importantFactors, priorityRanking, setValue],
+  );
+
+  // PriorityTag X 버튼 클릭 시 양방향 제거
+  const handlePriorityRemove = useCallback(
+    (value: string) => {
+      // priorityRanking에서 제거
+      const newRanking = priorityRanking.filter((v) => v !== value);
+      setValue("priorityRanking", newRanking, { shouldDirty: true });
+
+      // importantFactors에서도 제거
+      const newFactors = importantFactors.filter((v) => v !== value);
+      setValue("importantFactors", newFactors, { shouldDirty: true });
+    },
+    [priorityRanking, importantFactors, setValue],
+  );
 
   // 저장 (페이지 유지)
   const handleSave = async (data: Step5FormData) => {
@@ -214,20 +266,29 @@ export default function Step5Page() {
                 subtitle="드래그하여 순위 변경"
               />
 
-              {/* Priority Tags Container */}
-              <div className="flex flex-wrap gap-1">
-                {priorityRanking.map((id, index) => (
-                  <PriorityTag
-                    key={id}
-                    rank={index + 1}
-                    label={getPriorityLabel(id)}
-                    isDragging={draggedIndex === index}
-                    onDragStart={() => handleDragStart(index)}
-                    onDragOver={handleDragOver}
-                    onDrop={() => handleDrop(index)}
-                  />
-                ))}
-              </div>
+              {/* Priority Tags Container with @dnd-kit */}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={priorityRanking}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  <div className="flex flex-wrap gap-1">
+                    {priorityRanking.map((value, index) => (
+                      <SortablePriorityTag
+                        key={value}
+                        id={value}
+                        rank={index + 1}
+                        label={getPriorityLabel(value)}
+                        onRemove={() => handlePriorityRemove(value)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </section>
 
             {/* Section 2: 이성을 볼 때 중요하게 생각하는 요소 */}
@@ -247,7 +308,7 @@ export default function Step5Page() {
                       <TagGroup
                         options={importantFactorOptions}
                         value={field.value}
-                        onChange={field.onChange}
+                        onChange={handleImportantFactorsChange}
                         hasOtherOption={true}
                         otherValue={otherField.value || ""}
                         onOtherChange={otherField.onChange}
@@ -360,7 +421,6 @@ export default function Step5Page() {
                 <Card
                   label="소개받은 이성의 가족이 기독교 가정이길 바라시나요?"
                   subtitle="*필수"
-                  secondaryText="중복체크 가능"
                 >
                   <Controller
                     name="christianFamily"
@@ -458,7 +518,6 @@ export default function Step5Page() {
                 <Card
                   label="배우자의 희망 직업이 있으세요? (상관 없을시 '상관없음'으로 기재)"
                   subtitle="*필수"
-                  secondaryText="중복체크 가능"
                 >
                   <Controller
                     name="desiredJob"
@@ -467,7 +526,6 @@ export default function Step5Page() {
                       <TextInput
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder="상관없음"
                       />
                     )}
                   />
@@ -477,7 +535,6 @@ export default function Step5Page() {
                 <Card
                   label="배우자의 기피 직업이 있으세요? (상관 없을시 '상관없음'으로 기재)"
                   subtitle="*필수"
-                  secondaryText="중복체크 가능"
                 >
                   <Controller
                     name="avoidedJob"
@@ -486,7 +543,6 @@ export default function Step5Page() {
                       <TextInput
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder="상관없음"
                       />
                     )}
                   />
@@ -496,7 +552,6 @@ export default function Step5Page() {
                 <Card
                   label="배우자의 희망 연봉을 선택해주세요."
                   subtitle="*필수"
-                  secondaryText="중복체크 가능"
                 >
                   <Controller
                     name="desiredIncome"
@@ -515,7 +570,6 @@ export default function Step5Page() {
                 <Card
                   label="배우자의 음주, 흡연 희망 여부를 선택해주세요."
                   subtitle="*필수"
-                  secondaryText="중복체크 가능"
                 >
                   <Controller
                     name="drinkSmoke"
@@ -568,7 +622,6 @@ export default function Step5Page() {
                 <Card
                   label="재혼회원도 이상형에 부합한다면 괜찮나요?"
                   subtitle="*필수"
-                  secondaryText="중복체크 가능"
                 >
                   <Controller
                     name="remarriage"
@@ -600,7 +653,6 @@ export default function Step5Page() {
                 <Card
                   label="그 외 원하시는 배우자 정보를 자세하게 적어주세요. (신앙관, 성격, 가치관, 취미 등)"
                   subtitle="*필수"
-                  secondaryText="중복체크 가능"
                 >
                   <Controller
                     name="additionalCondition1"
@@ -609,7 +661,6 @@ export default function Step5Page() {
                       <InputCardTextArea
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder="답변을 작성해주세요."
                         height={80}
                       />
                     )}
@@ -628,7 +679,6 @@ export default function Step5Page() {
                       <InputCardTextArea
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder="답변을 작성해주세요."
                         height={80}
                       />
                     )}
