@@ -1,6 +1,5 @@
-"use client";
-
 import Image from "next/image";
+import OtherOptionInput from "./OtherOptionInput";
 
 interface TagOption {
   value: string;
@@ -27,11 +26,17 @@ export default function TagGroup({
   otherValue = "",
   onOtherChange,
 }: TagGroupProps) {
+  const otherOptionValue = hasOtherOption ? options[options.length - 1]?.value : null;
+
   const handleToggle = (tagValue: string) => {
     const isSelected = value.includes(tagValue);
 
     if (isSelected) {
       onChange?.(value.filter((v) => v !== tagValue));
+      // 기타 옵션 해제 시 텍스트 클리어
+      if (tagValue === otherOptionValue) {
+        onOtherChange?.("");
+      }
     } else {
       if (maxSelect && value.length >= maxSelect) {
         return;
@@ -57,15 +62,19 @@ export default function TagGroup({
         const isOtherOption = hasOtherOption && isLastOption;
 
         return (
-          <button
+          <label
             key={option.value}
-            type="button"
-            onClick={() => handleToggle(option.value)}
-            disabled={isDisabled}
-            className={`flex flex-row items-center gap-[4px] py-[4px] ${
+            className={`flex h-8 min-h-[27px] cursor-pointer items-center gap-1 py-1 ${
               isDisabled ? "cursor-not-allowed" : ""
             }`}
           >
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => handleToggle(option.value)}
+              disabled={isDisabled}
+              className="sr-only"
+            />
             <Image
               src={getCheckIcon(isSelected)}
               alt=""
@@ -73,32 +82,12 @@ export default function TagGroup({
               height={20}
             />
             {isOtherOption ? (
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-body-md ${
-                    isSelected
-                      ? "text-gray-800"
-                      : isDisabled
-                        ? "text-gray-300"
-                        : "text-gray-500"
-                  }`}
-                >
-                  {option.label}
-                </span>
-                <input
-                  type="text"
-                  value={otherValue}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    onOtherChange?.(e.target.value);
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                  className={`h-[32px] w-[100px] rounded border border-gray-200 px-2 py-1 text-body-md text-gray-800 outline-none focus:border-pink ${
-                    isSelected ? "bg-white" : "bg-gray-100"
-                  }`}
-                  placeholder=""
-                />
-              </div>
+              <OtherOptionInput
+                label={option.label}
+                value={otherValue}
+                onChange={(val) => onOtherChange?.(val)}
+                disabled={!isSelected}
+              />
             ) : (
               <span
                 className={`text-body-md ${
@@ -108,7 +97,7 @@ export default function TagGroup({
                 {option.label}
               </span>
             )}
-          </button>
+          </label>
         );
       })}
     </div>

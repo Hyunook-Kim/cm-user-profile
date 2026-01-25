@@ -1,7 +1,9 @@
+import NoticeText from "@/components/ui/NoticeText";
+
 interface CardProps {
   children: React.ReactNode;
   label: string;
-  subtitle?: string;
+  noticeText?: string;
   secondaryText?: string;
   helpIcon?: React.ReactNode;
 }
@@ -9,7 +11,7 @@ interface CardProps {
 export default function Card({
   children,
   label,
-  subtitle,
+  noticeText,
   secondaryText,
   helpIcon,
 }: CardProps) {
@@ -26,11 +28,9 @@ export default function Card({
         </div>
 
         {/* Conditions row: Figma flex-row, gap: 8px */}
-        {(subtitle || secondaryText) && (
-          <div className="flex flex-row gap-2">
-            {subtitle && (
-              <span className="text-caption-lg text-pink">{subtitle}</span>
-            )}
+        {(noticeText || secondaryText) && (
+          <div className="flex flex-row items-center gap-2">
+            {noticeText && <NoticeText text={noticeText} />}
             {secondaryText && (
               <span className="text-caption-lg text-gray-500">
                 {secondaryText}
