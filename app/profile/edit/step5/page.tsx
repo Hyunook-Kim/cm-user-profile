@@ -658,10 +658,9 @@ export default function Step5Page() {
                     name="additionalCondition1"
                     control={control}
                     render={({ field }) => (
-                      <InputCardTextArea
+                      <TextInput
                         value={field.value}
                         onChange={field.onChange}
-                        height={80}
                       />
                     )}
                   />
@@ -676,10 +675,9 @@ export default function Step5Page() {
                     name="additionalCondition2"
                     control={control}
                     render={({ field }) => (
-                      <InputCardTextArea
+                      <TextInput
                         value={field.value}
                         onChange={field.onChange}
-                        height={80}
                       />
                     )}
                   />
