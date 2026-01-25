@@ -140,7 +140,7 @@ export default function Step2Page() {
       <ProgressBar step={2} totalSteps={7} />
       <main className="flex flex-col items-start gap-[18px] overflow-y-auto bg-gray-100 p-4 pb-[96px]">
         <FormProvider {...methods}>
-          <Title title="나의 소개" step={2} subtitle="*모든 항목이 필수입니다." />
+          <Title title="나의 소개" step={2} subtitle="모든 항목이 필수입니다." />
 
           <form
             onSubmit={(e) => e.preventDefault()}

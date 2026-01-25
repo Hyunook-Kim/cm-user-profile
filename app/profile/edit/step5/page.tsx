@@ -294,7 +294,7 @@ export default function Step5Page() {
             {/* Section 2: 이성을 볼 때 중요하게 생각하는 요소 */}
             <Card
               label="이성을 볼 때 중요하게 생각하는 요소를 선택해주세요."
-              subtitle="*필수"
+              noticeText="필수"
               secondaryText="중복체크 가능"
             >
               <Controller
@@ -330,7 +330,7 @@ export default function Step5Page() {
               <div className="flex flex-col">
                 <Card
                   label="이상형의 원하는 거주지역을 선택해주세요."
-                  subtitle="*필수"
+                  noticeText="필수"
                   secondaryText="중복체크 가능"
                 >
                   <Controller
@@ -349,7 +349,7 @@ export default function Step5Page() {
                 {/* Card 2: 나이대 */}
                 <Card
                   label="평소 원하는 배우자 나이를 선택해주세요."
-                  subtitle="*필수"
+                  noticeText="필수"
                   secondaryText="중복체크 가능"
                 >
                   <Controller
@@ -392,7 +392,7 @@ export default function Step5Page() {
                 {/* Card 4: 학력 기준 */}
                 <Card
                   label="이상형의 원하는 학력기준을 선택해주세요."
-                  subtitle="*필수"
+                  noticeText="필수"
                   secondaryText="중복체크 가능"
                 >
                   <Controller
@@ -420,7 +420,7 @@ export default function Step5Page() {
                 {/* Card 5: 기독교 가정 */}
                 <Card
                   label="소개받은 이성의 가족이 기독교 가정이길 바라시나요?"
-                  subtitle="*필수"
+                  noticeText="필수"
                 >
                   <Controller
                     name="christianFamily"
@@ -440,7 +440,7 @@ export default function Step5Page() {
                 {/* Card 6: 체형 */}
                 <Card
                   label="원하시는 이상형 체형을 선택해주세요."
-                  subtitle="*필수"
+                  noticeText="필수"
                   secondaryText="중복체크 가능"
                 >
                   <Controller
@@ -459,7 +459,7 @@ export default function Step5Page() {
                 {/* Card 7: 스타일 */}
                 <Card
                   label="원하시는 이상형 스타일을 선택해주세요."
-                  subtitle="*필수"
+                  noticeText="필수"
                   secondaryText="중복체크 가능"
                 >
                   <Controller
@@ -478,7 +478,7 @@ export default function Step5Page() {
                 {/* Card 8: 신장 */}
                 <Card
                   label="이상형의 키를 선택해주세요."
-                  subtitle="*필수"
+                  noticeText="필수"
                   secondaryText="중복체크 가능"
                 >
                   <Controller
@@ -497,7 +497,7 @@ export default function Step5Page() {
                 {/* Card 9: 외모 포기 못하는 부분 */}
                 <Card
                   label="이성의 외모를 볼 때 포기할 수 없는 부분이 있나요? (키, 체형, 탈모, 얼굴 느낌 등)"
-                  subtitle="*필수"
+                  noticeText="필수"
                   secondaryText="중복체크 가능"
                 >
                   <Controller
@@ -517,7 +517,7 @@ export default function Step5Page() {
                 {/* Card 10: 희망 직업 */}
                 <Card
                   label="배우자의 희망 직업이 있으세요? (상관 없을시 '상관없음'으로 기재)"
-                  subtitle="*필수"
+                  noticeText="필수"
                 >
                   <Controller
                     name="desiredJob"
@@ -534,7 +534,7 @@ export default function Step5Page() {
                 {/* Card 11: 기피 직업 */}
                 <Card
                   label="배우자의 기피 직업이 있으세요? (상관 없을시 '상관없음'으로 기재)"
-                  subtitle="*필수"
+                  noticeText="필수"
                 >
                   <Controller
                     name="avoidedJob"
@@ -551,7 +551,7 @@ export default function Step5Page() {
                 {/* Card 12: 희망 연봉 */}
                 <Card
                   label="배우자의 희망 연봉을 선택해주세요."
-                  subtitle="*필수"
+                  noticeText="필수"
                 >
                   <Controller
                     name="desiredIncome"
@@ -569,7 +569,7 @@ export default function Step5Page() {
                 {/* Card 13: 음주/흡연 */}
                 <Card
                   label="배우자의 음주, 흡연 희망 여부를 선택해주세요."
-                  subtitle="*필수"
+                  noticeText="필수"
                 >
                   <Controller
                     name="drinkSmoke"
@@ -589,7 +589,7 @@ export default function Step5Page() {
                 {/* Card 14: 크리스천 사역자 */}
                 <Card
                   label="크리스천 사역자(목사, 선교사, 전도사, CCM사역자, 기독문화사역자, 교회간사 등)와의 만남은 어떠신가요?"
-                  subtitle="*필수"
+                  noticeText="필수"
                   secondaryText="중복체크 가능"
                 >
                   <Controller
@@ -621,7 +621,7 @@ export default function Step5Page() {
                 {/* Card 15: 재혼 */}
                 <Card
                   label="재혼회원도 이상형에 부합한다면 괜찮나요?"
-                  subtitle="*필수"
+                  noticeText="필수"
                 >
                   <Controller
                     name="remarriage"
@@ -652,7 +652,7 @@ export default function Step5Page() {
                 {/* Card 16: 추가 조건 1 */}
                 <Card
                   label="그 외 원하시는 배우자 정보를 자세하게 적어주세요. (신앙관, 성격, 가치관, 취미 등)"
-                  subtitle="*필수"
+                  noticeText="필수"
                 >
                   <Controller
                     name="additionalCondition1"
@@ -667,10 +667,7 @@ export default function Step5Page() {
                 </Card>
 
                 {/* Card 17: 추가 조건 2 */}
-                <Card
-                  label="그 외 배우자 및 이상형을 찾는 과정에서 매니저에게 부탁하고 싶은 말씀이나 건의사항 있으시다면 자유롭게 적어주세요."
-                  subtitle=""
-                >
+                <Card label="그 외 배우자 및 이상형을 찾는 과정에서 매니저에게 부탁하고 싶은 말씀이나 건의사항 있으시다면 자유롭게 적어주세요.">
                   <Controller
                     name="additionalCondition2"
                     control={control}

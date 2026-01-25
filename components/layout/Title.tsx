@@ -1,3 +1,5 @@
+import NoticeText from "@/components/ui/NoticeText";
+
 interface TitleProps {
   title: string;
   step: number;
@@ -20,11 +22,7 @@ export default function Title({
           {title}
         </h2>
         {helpIcon}
-        {subtitle && (
-          <span className="text-[14px] font-medium leading-[20px] text-pink">
-            {subtitle}
-          </span>
-        )}
+        {subtitle && <NoticeText text={subtitle} />}
       </div>
       <span className="text-[18px] font-medium leading-[24px] text-black">
         {step} / {totalSteps}
