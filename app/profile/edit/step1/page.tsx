@@ -329,8 +329,7 @@ export default function Step1Page() {
               <RadioGroup
                 name="salary"
                 options={salaryOptions}
-                layout="grid"
-                columns={3}
+                layout="horizontal"
                 value={field.value}
                 onChange={field.onChange}
               />
@@ -377,8 +376,7 @@ export default function Step1Page() {
               <RadioGroup
                 name="bodyType"
                 options={bodyTypeOptions}
-                layout="grid"
-                columns={3}
+                layout="horizontal"
                 value={field.value}
                 onChange={field.onChange}
               />
@@ -425,8 +423,7 @@ export default function Step1Page() {
               <RadioGroup
                 name="drinking"
                 options={drinkingOptions}
-                layout="grid"
-                columns={2}
+                layout="horizontal"
                 value={field.value}
                 onChange={field.onChange}
               />

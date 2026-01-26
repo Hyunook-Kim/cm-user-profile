@@ -557,10 +557,12 @@ export default function Step5Page() {
                     name="desiredIncome"
                     control={control}
                     render={({ field }) => (
-                      <TagGroup
+                      <RadioGroup
+                        name="desiredIncome"
                         options={toTagOptions(incomeOptions)}
                         value={field.value}
                         onChange={field.onChange}
+                        layout="horizontal"
                       />
                     )}
                   />

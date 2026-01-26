@@ -192,8 +192,8 @@ export const step5Schema = z.object({
   // Card 11: 기피 직업 (텍스트 입력)
   avoidedJob: z.string(),
 
-  // Card 12: 희망 연봉 (다중 선택)
-  desiredIncome: z.array(z.string()),
+  // Card 12: 희망 연봉 (단일 선택)
+  desiredIncome: z.string(),
 
   // Card 13: 음주/흡연 (단일 선택)
   drinkSmoke: z.string(),
@@ -238,7 +238,7 @@ export const step5DefaultValues: Step5FormData = {
   appearanceImportant: "",
   desiredJob: "",
   avoidedJob: "",
-  desiredIncome: [],
+  desiredIncome: "",
   drinkSmoke: "",
   christianWorker: "",
   christianWorkerOther: "",
