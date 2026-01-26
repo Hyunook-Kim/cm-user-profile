@@ -592,7 +592,6 @@ export default function Step5Page() {
                 <Card
                   label="크리스천 사역자(목사, 선교사, 전도사, CCM사역자, 기독문화사역자, 교회간사 등)와의 만남은 어떠신가요?"
                   noticeText="필수"
-                  secondaryText="중복체크 가능"
                 >
                   <Controller
                     name="christianWorker"
@@ -605,14 +604,12 @@ export default function Step5Page() {
                           <RadioGroup
                             options={christianWorkerOptions}
                             value={field.value}
-                            onChange={(val) => {
-                              field.onChange(val);
-                              if (val !== "other") {
-                                otherField.onChange("");
-                              }
-                            }}
+                            onChange={field.onChange}
                             name="christianWorker"
                             layout="vertical"
+                            otherValue="other"
+                            otherInputValue={otherField.value}
+                            onOtherInputChange={otherField.onChange}
                           />
                         )}
                       />
@@ -636,14 +633,12 @@ export default function Step5Page() {
                           <RadioGroup
                             options={remarriageOptions}
                             value={field.value}
-                            onChange={(val) => {
-                              field.onChange(val);
-                              if (val !== "other") {
-                                otherField.onChange("");
-                              }
-                            }}
+                            onChange={field.onChange}
                             name="remarriage"
                             layout="vertical"
+                            otherValue="other"
+                            otherInputValue={otherField.value}
+                            onOtherInputChange={otherField.onChange}
                           />
                         )}
                       />
