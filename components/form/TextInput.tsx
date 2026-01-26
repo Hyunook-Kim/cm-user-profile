@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef, useEffect } from "react";
+
 interface TextInputProps {
   value?: string;
   onChange?: (value: string) => void;
@@ -11,14 +15,25 @@ export default function TextInput({
   placeholder = "",
   disabled = false,
 }: TextInputProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [value]);
+
   return (
-    <input
-      type="text"
+    <textarea
+      ref={textareaRef}
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       placeholder={placeholder}
       disabled={disabled}
-      className="h-10 w-full rounded border border-gray-200 bg-white px-3 py-2 text-[14px] font-extralight leading-[20px] text-gray-800 placeholder:text-gray-400 focus:border-pink focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+      rows={1}
+      className="min-h-10 w-full resize-none overflow-hidden rounded border border-gray-200 bg-white px-3 py-2 text-body-md text-gray-800 placeholder:text-gray-300 focus:border-pink focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
     />
   );
 }

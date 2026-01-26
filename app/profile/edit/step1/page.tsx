@@ -152,7 +152,7 @@ export default function Step1Page() {
       <ProgressBar step={1} totalSteps={7} />
       <main className="flex flex-col items-start gap-[18px] overflow-y-auto bg-gray-100 p-4 pb-[96px]">
         <FormProvider {...methods}>
-          <Title title="기본 정보" step={1} subtitle="*모든 항목이 필수입니다." />
+          <Title title="기본 정보" step={1} subtitle="모든 항목이 필수입니다." />
 
           <form
             onSubmit={(e) => e.preventDefault()}
@@ -329,8 +329,7 @@ export default function Step1Page() {
               <RadioGroup
                 name="salary"
                 options={salaryOptions}
-                layout="grid"
-                columns={3}
+                layout="horizontal"
                 value={field.value}
                 onChange={field.onChange}
               />
@@ -377,8 +376,7 @@ export default function Step1Page() {
               <RadioGroup
                 name="bodyType"
                 options={bodyTypeOptions}
-                layout="grid"
-                columns={3}
+                layout="horizontal"
                 value={field.value}
                 onChange={field.onChange}
               />
@@ -386,7 +384,7 @@ export default function Step1Page() {
           />
         </Card>
 
-        <Card label="나의 스타일" subtitle="*최대 5개">
+        <Card label="나의 스타일" noticeText="최대 5개">
           <Controller
             name="styles"
             control={control}
@@ -425,8 +423,7 @@ export default function Step1Page() {
               <RadioGroup
                 name="drinking"
                 options={drinkingOptions}
-                layout="grid"
-                columns={2}
+                layout="horizontal"
                 value={field.value}
                 onChange={field.onChange}
               />
