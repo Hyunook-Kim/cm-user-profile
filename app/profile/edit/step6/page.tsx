@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useForm, Controller, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFormNavigation } from "@/hooks/useFormNavigation";
 import { saveStepData, getStepData } from "@/lib/api/profile";
@@ -13,6 +13,8 @@ import FooterNav from "@/components/layout/FooterNav";
 import ExitConfirmModal from "@/components/common/ExitConfirmModal";
 import SectionTitle from "@/components/ui/SectionTitle";
 import SecondaryButton from "@/components/ui/SecondaryButton";
+import CategoryCard from "@/components/form/CategoryCard";
+import SelectedChip from "@/components/ui/SelectedChip";
 import {
   step6Schema,
   step6DefaultValues,
@@ -31,115 +33,6 @@ const saveToServer = async (data: Step6FormData) => {
     throw new Error(result.error);
   }
 };
-
-// 태그 버튼 컴포넌트 (라이프스타일 스타일)
-interface LifestyleTagProps {
-  label: string;
-  isSelected: boolean;
-  isDisabled: boolean;
-  onClick: () => void;
-  variant?: "hobby" | "exercise" | "interest";
-}
-
-function LifestyleTag({
-  label,
-  isSelected,
-  isDisabled,
-  onClick,
-  variant = "hobby",
-}: LifestyleTagProps) {
-  // 취미 섹션: 미선택 시 회색 배경
-  // 운동/관심사 섹션: 미선택 시 흰색 배경 + 회색 테두리
-  const baseStyles =
-    "flex items-center px-3 py-2 rounded-full text-caption-md transition-colors";
-
-  let stateStyles = "";
-  if (isSelected) {
-    stateStyles = "bg-white border border-pink text-pink";
-  } else if (isDisabled) {
-    stateStyles =
-      variant === "hobby"
-        ? "bg-gray-100 text-gray-300 cursor-not-allowed"
-        : "bg-white border border-gray-200 text-gray-300 cursor-not-allowed";
-  } else {
-    stateStyles =
-      variant === "hobby"
-        ? "bg-gray-100 text-gray-300"
-        : "bg-white border border-gray-200 text-gray-800";
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={isDisabled && !isSelected}
-      className={`${baseStyles} ${stateStyles}`}
-    >
-      {label}
-    </button>
-  );
-}
-
-// 카테고리 카드 컴포넌트
-interface CategoryCardProps {
-  label: string;
-  tags: string[];
-  selectedTags: string[];
-  maxSelect: number;
-  onToggle: (tag: string) => void;
-  variant?: "hobby" | "exercise" | "interest";
-  isFirst?: boolean;
-  isLast?: boolean;
-}
-
-function CategoryCard({
-  label,
-  tags,
-  selectedTags,
-  maxSelect,
-  onToggle,
-  variant = "hobby",
-  isFirst = false,
-  isLast = false,
-}: CategoryCardProps) {
-  const isMaxReached = selectedTags.length >= maxSelect;
-
-  const roundedClass =
-    isFirst && isLast
-      ? "rounded-lg"
-      : isFirst
-        ? "rounded-t-lg"
-        : isLast
-          ? "rounded-b-lg"
-          : "";
-
-  const borderClass = isFirst ? "border" : "border border-t-0";
-
-  return (
-    <div
-      className={`flex flex-col gap-3 bg-white p-5 ${roundedClass} ${borderClass} border-gray-100`}
-    >
-      <span className="text-caption-lg text-black">{label}</span>
-      <div className="flex flex-wrap gap-x-1 gap-y-2">
-        {tags.map((tag) => {
-          const isSelected = selectedTags.includes(tag);
-          const isDisabled = !isSelected && isMaxReached;
-
-          return (
-            <LifestyleTag
-              key={tag}
-              label={tag}
-              isSelected={isSelected}
-              isDisabled={isDisabled}
-              onClick={() => onToggle(tag)}
-              variant={variant}
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 export default function Step6Page() {
   const [isSaving, setIsSaving] = useState(false);
@@ -295,6 +188,18 @@ export default function Step6Page() {
                   onClick={() => setValue("hobbies", [], { shouldDirty: true })}
                 />
               </div>
+              {/* Selected 영역 */}
+              {hobbies.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {hobbies.map((hobby) => (
+                    <SelectedChip
+                      key={hobby}
+                      text={hobby}
+                      onRemove={() => createToggleHandler("hobbies", hobbies, 5)(hobby)}
+                    />
+                  ))}
+                </div>
+              )}
               <div className="flex flex-col">
                 {hobbyCateg.map((category, index) => (
                   <CategoryCard
@@ -304,7 +209,6 @@ export default function Step6Page() {
                     selectedTags={hobbies}
                     maxSelect={5}
                     onToggle={createToggleHandler("hobbies", hobbies, 5)}
-                    variant="hobby"
                     isFirst={index === 0}
                     isLast={index === hobbyCateg.length - 1}
                   />
@@ -322,6 +226,18 @@ export default function Step6Page() {
                   onClick={() => setValue("exercises", [], { shouldDirty: true })}
                 />
               </div>
+              {/* Selected 영역 */}
+              {exercises.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {exercises.map((exercise) => (
+                    <SelectedChip
+                      key={exercise}
+                      text={exercise}
+                      onRemove={() => createToggleHandler("exercises", exercises, 5)(exercise)}
+                    />
+                  ))}
+                </div>
+              )}
               <div className="flex flex-col">
                 {exerciseCateg.map((category, index) => (
                   <CategoryCard
@@ -331,7 +247,6 @@ export default function Step6Page() {
                     selectedTags={exercises}
                     maxSelect={5}
                     onToggle={createToggleHandler("exercises", exercises, 5)}
-                    variant="exercise"
                     isFirst={index === 0}
                     isLast={index === exerciseCateg.length - 1}
                   />
@@ -349,6 +264,18 @@ export default function Step6Page() {
                   onClick={() => setValue("interests", [], { shouldDirty: true })}
                 />
               </div>
+              {/* Selected 영역 */}
+              {interests.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {interests.map((interest) => (
+                    <SelectedChip
+                      key={interest}
+                      text={interest}
+                      onRemove={() => createToggleHandler("interests", interests, 5)(interest)}
+                    />
+                  ))}
+                </div>
+              )}
               <div className="flex flex-col">
                 {interestCateg.map((category, index) => (
                   <CategoryCard
@@ -358,7 +285,6 @@ export default function Step6Page() {
                     selectedTags={interests}
                     maxSelect={5}
                     onToggle={createToggleHandler("interests", interests, 5)}
-                    variant="interest"
                     isFirst={index === 0}
                     isLast={index === interestCateg.length - 1}
                   />
