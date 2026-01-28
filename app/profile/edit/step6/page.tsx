@@ -15,6 +15,9 @@ import SectionTitle from "@/components/ui/SectionTitle";
 import SecondaryButton from "@/components/ui/SecondaryButton";
 import CategoryCard from "@/components/form/CategoryCard";
 import SelectedChip from "@/components/ui/SelectedChip";
+import Chip from "@/components/ui/Chip";
+import InputChip from "@/components/ui/InputChip";
+import AddButton from "@/components/ui/AddButton";
 import {
   step6Schema,
   step6DefaultValues,
@@ -38,6 +41,14 @@ export default function Step6Page() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 직접입력 상태
+  const [hobbyInputValue, setHobbyInputValue] = useState("");
+  const [showHobbyInput, setShowHobbyInput] = useState(false);
+  const [exerciseInputValue, setExerciseInputValue] = useState("");
+  const [showExerciseInput, setShowExerciseInput] = useState(false);
+  const [interestInputValue, setInterestInputValue] = useState("");
+  const [showInterestInput, setShowInterestInput] = useState(false);
+
   const methods = useForm<Step6FormData>({
     resolver: zodResolver(step6Schema),
     defaultValues: step6DefaultValues,
@@ -54,8 +65,11 @@ export default function Step6Page() {
   } = methods;
 
   const hobbies = watch("hobbies");
+  const hobbyCustom = watch("hobbyCustom");
   const exercises = watch("exercises");
+  const exerciseCustom = watch("exerciseCustom");
   const interests = watch("interests");
+  const interestCustom = watch("interestCustom");
 
   // 폼 네비게이션 (dirty check + 모달)
   const {
@@ -114,6 +128,48 @@ export default function Step6Page() {
     },
     [setValue],
   );
+
+  // 직접입력 제출 핸들러
+  const handleHobbyCustomSubmit = (value: string) => {
+    if (hobbies.length < 5) {
+      setValue("hobbyCustom", [...hobbyCustom, value], { shouldDirty: true });
+    }
+    setHobbyInputValue("");
+    setShowHobbyInput(false);
+  };
+
+  const handleExerciseCustomSubmit = (value: string) => {
+    if (exercises.length < 5) {
+      setValue("exerciseCustom", [...exerciseCustom, value], {
+        shouldDirty: true,
+      });
+    }
+    setExerciseInputValue("");
+    setShowExerciseInput(false);
+  };
+
+  const handleInterestCustomSubmit = (value: string) => {
+    if (interests.length < 5) {
+      setValue("interestCustom", [...interestCustom, value], {
+        shouldDirty: true,
+      });
+    }
+    setInterestInputValue("");
+    setShowInterestInput(false);
+  };
+
+  // TODO: InputChip 삭제 로직 부분. UI/UX가 정해지는대로 구현.
+  // const removeHobbyCustom = (tag: string) => {
+  //   setValue("hobbyCustom", hobbyCustom.filter((t) => t !== tag), { shouldDirty: true });
+  // };
+
+  // const removeExerciseCustom = (tag: string) => {
+  //   setValue("exerciseCustom", exerciseCustom.filter((t) => t !== tag), { shouldDirty: true });
+  // };
+
+  // const removeInterestCustom = (tag: string) => {
+  //   setValue("interestCustom", interestCustom.filter((t) => t !== tag), { shouldDirty: true });
+  // };
 
   // 저장 (페이지 유지)
   const handleSave = async (data: Step6FormData) => {
@@ -195,7 +251,9 @@ export default function Step6Page() {
                     <SelectedChip
                       key={hobby}
                       text={hobby}
-                      onRemove={() => createToggleHandler("hobbies", hobbies, 5)(hobby)}
+                      onRemove={() =>
+                        createToggleHandler("hobbies", hobbies, 5)(hobby)
+                      }
                     />
                   ))}
                 </div>
@@ -210,9 +268,46 @@ export default function Step6Page() {
                     maxSelect={5}
                     onToggle={createToggleHandler("hobbies", hobbies, 5)}
                     isFirst={index === 0}
-                    isLast={index === hobbyCateg.length - 1}
+                    isLast={false}
                   />
                 ))}
+                {/* 직접입력 카드 */}
+                <div className="flex flex-col gap-3 rounded-b-lg border border-t-0 border-gray-100 bg-white p-5">
+                  <span className="text-caption-lg text-black">직접입력</span>
+                  <div className="flex flex-wrap items-center gap-x-1 gap-y-2">
+                    {hobbyCustom.map((tag) => {
+                      const isSelected = hobbies.includes(tag);
+                      const isMaxReached = hobbies.length >= 5;
+                      const chipStatus = isSelected
+                        ? "on"
+                        : isMaxReached
+                          ? "none"
+                          : "off";
+                      return (
+                        <Chip
+                          key={tag}
+                          text={tag}
+                          status={chipStatus}
+                          onClick={() =>
+                            createToggleHandler("hobbies", hobbies, 5)(tag)
+                          }
+                        />
+                      );
+                    })}
+                    {(hobbyCustom.length === 0 || showHobbyInput) && (
+                      <InputChip
+                        value={hobbyInputValue}
+                        onChange={setHobbyInputValue}
+                        onSubmit={handleHobbyCustomSubmit}
+                        status={hobbies.length >= 5 ? "none" : "off"}
+                      />
+                    )}
+                    <AddButton
+                      onClick={() => setShowHobbyInput(true)}
+                      disabled={hobbies.length >= 5}
+                    />
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -223,7 +318,9 @@ export default function Step6Page() {
                 <SecondaryButton
                   label="선택 초기화"
                   icon="/icons/basic/refresh-line-white.svg"
-                  onClick={() => setValue("exercises", [], { shouldDirty: true })}
+                  onClick={() =>
+                    setValue("exercises", [], { shouldDirty: true })
+                  }
                 />
               </div>
               {/* Selected 영역 */}
@@ -233,7 +330,9 @@ export default function Step6Page() {
                     <SelectedChip
                       key={exercise}
                       text={exercise}
-                      onRemove={() => createToggleHandler("exercises", exercises, 5)(exercise)}
+                      onRemove={() =>
+                        createToggleHandler("exercises", exercises, 5)(exercise)
+                      }
                     />
                   ))}
                 </div>
@@ -248,9 +347,46 @@ export default function Step6Page() {
                     maxSelect={5}
                     onToggle={createToggleHandler("exercises", exercises, 5)}
                     isFirst={index === 0}
-                    isLast={index === exerciseCateg.length - 1}
+                    isLast={false}
                   />
                 ))}
+                {/* 직접입력 카드 */}
+                <div className="flex flex-col gap-3 rounded-b-lg border border-t-0 border-gray-100 bg-white p-5">
+                  <span className="text-caption-lg text-black">직접입력</span>
+                  <div className="flex flex-wrap items-center gap-x-1 gap-y-2">
+                    {exerciseCustom.map((tag) => {
+                      const isSelected = exercises.includes(tag);
+                      const isMaxReached = exercises.length >= 5;
+                      const chipStatus = isSelected
+                        ? "on"
+                        : isMaxReached
+                          ? "none"
+                          : "off";
+                      return (
+                        <Chip
+                          key={tag}
+                          text={tag}
+                          status={chipStatus}
+                          onClick={() =>
+                            createToggleHandler("exercises", exercises, 5)(tag)
+                          }
+                        />
+                      );
+                    })}
+                    {(exerciseCustom.length === 0 || showExerciseInput) && (
+                      <InputChip
+                        value={exerciseInputValue}
+                        onChange={setExerciseInputValue}
+                        onSubmit={handleExerciseCustomSubmit}
+                        status={exercises.length >= 5 ? "none" : "off"}
+                      />
+                    )}
+                    <AddButton
+                      onClick={() => setShowExerciseInput(true)}
+                      disabled={exercises.length >= 5}
+                    />
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -261,7 +397,9 @@ export default function Step6Page() {
                 <SecondaryButton
                   label="선택 초기화"
                   icon="/icons/basic/refresh-line-white.svg"
-                  onClick={() => setValue("interests", [], { shouldDirty: true })}
+                  onClick={() =>
+                    setValue("interests", [], { shouldDirty: true })
+                  }
                 />
               </div>
               {/* Selected 영역 */}
@@ -271,7 +409,9 @@ export default function Step6Page() {
                     <SelectedChip
                       key={interest}
                       text={interest}
-                      onRemove={() => createToggleHandler("interests", interests, 5)(interest)}
+                      onRemove={() =>
+                        createToggleHandler("interests", interests, 5)(interest)
+                      }
                     />
                   ))}
                 </div>
@@ -286,9 +426,46 @@ export default function Step6Page() {
                     maxSelect={5}
                     onToggle={createToggleHandler("interests", interests, 5)}
                     isFirst={index === 0}
-                    isLast={index === interestCateg.length - 1}
+                    isLast={false}
                   />
                 ))}
+                {/* 직접입력 카드 */}
+                <div className="flex flex-col gap-3 rounded-b-lg border border-t-0 border-gray-100 bg-white p-5">
+                  <span className="text-caption-lg text-black">직접입력</span>
+                  <div className="flex flex-wrap items-center gap-x-1 gap-y-2">
+                    {interestCustom.map((tag) => {
+                      const isSelected = interests.includes(tag);
+                      const isMaxReached = interests.length >= 5;
+                      const chipStatus = isSelected
+                        ? "on"
+                        : isMaxReached
+                          ? "none"
+                          : "off";
+                      return (
+                        <Chip
+                          key={tag}
+                          text={tag}
+                          status={chipStatus}
+                          onClick={() =>
+                            createToggleHandler("interests", interests, 5)(tag)
+                          }
+                        />
+                      );
+                    })}
+                    {(interestCustom.length === 0 || showInterestInput) && (
+                      <InputChip
+                        value={interestInputValue}
+                        onChange={setInterestInputValue}
+                        onSubmit={handleInterestCustomSubmit}
+                        status={interests.length >= 5 ? "none" : "off"}
+                      />
+                    )}
+                    <AddButton
+                      onClick={() => setShowInterestInput(true)}
+                      disabled={interests.length >= 5}
+                    />
+                  </div>
+                </div>
               </div>
             </section>
           </form>
