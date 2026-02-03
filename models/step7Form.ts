@@ -22,13 +22,13 @@ export const loveLanguageOptions = [
   {
     id: "actsOfService",
     label: "봉사",
-    icon: "hand-heart-line",
+    icon: "service-line",
     description: "나를 위해 어렵고 힘든 일을 대신 도와줄 때",
   },
   {
     id: "wordsOfAffirmation",
     label: "인정하는 말",
-    icon: "chat-heart-line",
+    icon: "lovetalk-line",
     description: "나의 장점과 매력을 칭찬과 인정의 말로 표현해줄 때",
   },
   {

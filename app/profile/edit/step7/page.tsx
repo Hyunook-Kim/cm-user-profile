@@ -3,9 +3,21 @@
 import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { useFormNavigation } from "@/hooks/useFormNavigation";
 import { saveStepData, getStepData } from "@/lib/api/profile";
-import Image from "next/image";
 import Header from "@/components/layout/Header";
 import ProgressBar from "@/components/layout/ProgressBar";
 import Title from "@/components/layout/Title";
@@ -13,6 +25,7 @@ import ContentFooter from "@/components/layout/ContentFooter";
 import FooterNav from "@/components/layout/FooterNav";
 import ExitConfirmModal from "@/components/common/ExitConfirmModal";
 import RadioGroup from "@/components/form/RadioGroup";
+import SortableLoveLanguageItem from "@/components/form/SortableLoveLanguageItem";
 import {
   step7Schema,
   step7DefaultValues,
@@ -61,7 +74,15 @@ const mainRecommendationDescriptions: Record<
 export default function Step7Page() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  // @dnd-kit 센서 설정 (PointerSensor: 마우스 + 터치 + 에뮬레이션 통합)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // 5px 이동 후 드래그 시작
+      },
+    }),
+  );
 
   const methods = useForm<Step7FormData>({
     resolver: zodResolver(step7Schema),
@@ -114,32 +135,20 @@ export default function Step7Page() {
     loadData();
   }, [reset]);
 
-  // 드래그 시작
-  const handleDragStart = useCallback((index: number) => {
-    setDraggedIndex(index);
-  }, []);
+  // @dnd-kit 드래그 종료 핸들러
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
 
-  // 드래그 오버
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-  }, []);
+      if (over && active.id !== over.id) {
+        const oldIndex = loveLanguageRanking.indexOf(active.id as string);
+        const newIndex = loveLanguageRanking.indexOf(over.id as string);
 
-  // 드롭
-  const handleDrop = useCallback(
-    (dropIndex: number) => {
-      if (draggedIndex === null || draggedIndex === dropIndex) {
-        setDraggedIndex(null);
-        return;
+        const newRanking = arrayMove(loveLanguageRanking, oldIndex, newIndex);
+        setValue("loveLanguageRanking", newRanking, { shouldDirty: true });
       }
-
-      const newRanking = [...loveLanguageRanking];
-      const [removed] = newRanking.splice(draggedIndex, 1);
-      newRanking.splice(dropIndex, 0, removed);
-
-      setValue("loveLanguageRanking", newRanking, { shouldDirty: true });
-      setDraggedIndex(null);
     },
-    [draggedIndex, loveLanguageRanking, setValue],
+    [loveLanguageRanking, setValue],
   );
 
   // 저장 (페이지 유지)
@@ -208,65 +217,41 @@ export default function Step7Page() {
           >
             {/* Section 1: 사랑의 언어 */}
             <section className="flex flex-col gap-3">
-              {/* Section Title */}
-              {/* <div className="flex items-center gap-3">
-                <span className="text-body-lg text-black">사랑의 언어</span>
-                <span className="text-caption-lg text-pink">
-                  *드래그하여 순위 변경
-                </span>
-              </div> */}
               <SectionTitle
                 title="사랑의 언어"
                 subtitle="드래그하여 순위 변경"
               />
 
-              {/* Draggable List */}
-              <div className="flex flex-col gap-1">
-                {loveLanguageRanking.map((id, index) => {
-                  const option = getLoveLanguageById(id);
-                  if (!option) return null;
+              {/* Draggable List with @dnd-kit */}
+              <DndContext
+                id="love-language-dnd"
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={loveLanguageRanking}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="flex flex-col gap-1">
+                    {loveLanguageRanking.map((id, index) => {
+                      const option = getLoveLanguageById(id);
+                      if (!option) return null;
 
-                  return (
-                    <div
-                      key={option.id}
-                      draggable
-                      onDragStart={() => handleDragStart(index)}
-                      onDragOver={handleDragOver}
-                      onDrop={() => handleDrop(index)}
-                      className={`flex cursor-grab items-center gap-3 rounded-lg border bg-white p-3 active:cursor-grabbing ${
-                        draggedIndex === index
-                          ? "border-pink opacity-50"
-                          : "border-gray-200"
-                      }`}
-                    >
-                      {/* Leading Icon */}
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100">
-                        <Image
-                          src={`/icons/love-language/${option.icon}.svg`}
-                          alt=""
-                          width={20}
-                          height={20}
+                      return (
+                        <SortableLoveLanguageItem
+                          key={option.id}
+                          id={option.id}
+                          rank={index + 1}
+                          label={option.label}
+                          description={option.description}
+                          icon={option.icon}
                         />
-                      </div>
-
-                      {/* Text Area */}
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-1">
-                          <span className="text-caption-lg text-pink">
-                            {index + 1}위
-                          </span>
-                          <span className="text-caption-lg text-gray-800">
-                            {option.label}
-                          </span>
-                        </div>
-                        <span className="text-caption-md text-gray-500">
-                          {option.description}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                      );
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </section>
 
             {/* Section 2: 기타 */}
