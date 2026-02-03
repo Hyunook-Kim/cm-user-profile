@@ -268,6 +268,7 @@ export default function Step5Page() {
 
               {/* Priority Tags Container with @dnd-kit */}
               <DndContext
+                id="priority-ranking-dnd"
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragEnd={handleDragEnd}
